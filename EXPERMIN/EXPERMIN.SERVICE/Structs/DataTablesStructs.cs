@@ -24,7 +24,7 @@ namespace EXPERMIN.SERIVICE.Structs
             public int DrawCounter { get; set; }
             public string Error { get; set; }
             public int RecordsFiltered { get; set; }
-            public int RecordsTotal { get; set; }
+            public int TotalRecords { get; set; }
         }
     }
 }

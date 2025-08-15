@@ -22,4 +22,8 @@
     <ProjectReference Include="..\EXPERMIN.SERVICE\EXPERMIN.SERVICE.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infraestructure\Errors\" />
+  </ItemGroup>
+
 </Project>

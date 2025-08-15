@@ -18,6 +18,7 @@ namespace EXPERMIN.SERVICE.Dtos.Generic
         DoesNotExist,
         ServerError,
         Invalid,
+        InvalidParameters,
         InvalidInput,
         Unauthorized,
         AlreadyExists,
