@@ -13,7 +13,6 @@ namespace EXPERMIN.REPOSITORY.Repositories.User.Interfaces
 
     public interface IUserRepository : IRepository<ApplicationUser>
     {
-        Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password);
         Task<ApplicationUser> FindByEmailAsync(string value);
         Task<ApplicationUser> FindByUserNameAsync(string userName);
         Task<ApplicationUser> GetUserByClaim(ClaimsPrincipal user);
@@ -21,8 +20,6 @@ namespace EXPERMIN.REPOSITORY.Repositories.User.Interfaces
         Task<bool> AnyByUsername(string username);
         Task<bool> AnyByEmail(string email);
         Task<bool> ExistsAsync(string userId);
-        Task AddToRoleAsync(ApplicationUser user, string role);
-        Task UpdateToRoleAsync(ApplicationUser user, string role);
         Task<List<ApplicationUser>> GetAllUserAsync();
         Task<ApplicationUser> GetUserById(string id);
         Task<List<ApplicationRole>> GetRolesAsync(string userId);

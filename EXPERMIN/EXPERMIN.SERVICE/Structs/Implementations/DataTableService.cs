@@ -88,7 +88,7 @@ namespace EXPERMIN.SERIVICE.Services.Implementations
                 Data = data,
                 DrawCounter = GetDrawCounter(),
                 RecordsFiltered = recordsFiltered,
-                RecordsTotal = recordsFiltered
+                TotalRecords = recordsFiltered
             };
         }
 

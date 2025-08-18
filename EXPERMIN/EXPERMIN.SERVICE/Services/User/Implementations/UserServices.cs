@@ -7,6 +7,7 @@ using EXPERMIN.SERVICE.Dtos.User;
 using EXPERMIN.SERVICE.Security.Interfaces;
 using EXPERMIN.SERVICE.Services.User.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,16 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
-        public readonly IMapper _mapper;
+        private readonly IMapper _mapper;
         private readonly IPasswordService _passwordService;
         private readonly IJwtService _jwtService;
         private readonly IRoleRepository _roleRepository;
         private readonly IUserValidationService _userValidationService;
-        public UserServices(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IMapper mapper, IPasswordService passwordService, IJwtService jwtService, IRoleRepository roleRepository, IUserValidationService userValidationService)
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public UserServices(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IMapper mapper, IPasswordService passwordService, 
+            IJwtService jwtService, IRoleRepository roleRepository, IUserValidationService userValidationService,
+            RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
@@ -35,6 +40,8 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
             _jwtService = jwtService;
             _roleRepository = roleRepository;
             _userValidationService = userValidationService;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         public string GetUserId()
@@ -101,22 +108,41 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
                 await _roleRepository.CreateRoleAsync(role);
             }
 
-            //Agregar usuario temporalmente
+            // Crear usuario (sin password hash manual, lo hace UserManager)
             var user = new ApplicationUser
             {
                 UserName = model.UserName,
                 Name = model.Name,
                 LastName = model.LastName,
-                Email = model.Email,
-                PasswordHash = _passwordService.HashPassword(model.Password)
+                Email = model.Email
             };
-            await _userRepository.Add(user);
 
-            // Asignar rol
-            await _userRepository.AddToRoleAsync(user, role.Name);
+            // Ejecutar en transacción
+            return await _userRepository.ExecuteInTransactionAsync(async () =>
+            {
+                var createUserResult = await _userManager.CreateAsync(user, model.Password);
+                if (!createUserResult.Succeeded)
+                {
+                    return new OperationDto<UserDto>(
+                        OperationCodeDto.OperationError,
+                        string.Join(", ", createUserResult.Errors.Select(e => e.Description))
+                    );
+                }
 
-            await _userRepository.CreateUserAsync(user, model.Password);
-            return new OperationDto<UserDto>(new UserDto { Id = user.Id, UserName = user.UserName }, "Registro de Usuario exitoso");
+                var roleResult = await _userManager.AddToRoleAsync(user, roleName);
+                if (!roleResult.Succeeded)
+                {
+                    return new OperationDto<UserDto>(
+                        OperationCodeDto.OperationError,
+                        string.Join(", ", roleResult.Errors.Select(e => e.Description))
+                    );
+                }
+
+                return new OperationDto<UserDto>(
+                    new UserDto { Id = user.Id, UserName = user.UserName },
+                    "Se creó correctamente el usuario."
+                );
+            });
         }
         public async Task<OperationDto<UserDetailDto>> UpdateUser(string userLoggedId, string id, UserUpdateDto model)
         {
@@ -126,34 +152,73 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
             if (validationResult != null)
                 return validationResult;
 
-            //Obtener el usuario
+            // Obtener el usuario
             var user = await _userRepository.GetUserById(id);
             if (user == null)
                 return new OperationDto<UserDetailDto>(OperationCodeDto.DoesNotExist, "No existe el usuario.");
 
-            //validar si existe el rol en la BD, sino crearlo
-            if (model.Role.HasValue)
+            return await _userRepository.ExecuteInTransactionAsync(async () =>
             {
-                if (!ConstantHelpers.ROLES.INDICES.TryGetValue(model.Role.Value, out string roleName))
-                    return new OperationDto<UserDetailDto>(OperationCodeDto.Invalid, "El rol proporcionado no es válido.");
-
-                var role = await _roleRepository.GetRoleByName(ConstantHelpers.ROLES.INDICES[model.Role.Value]);
-                if (role == null)
+                // Si se pasó un rol nuevo
+                if (model.Role.HasValue)
                 {
-                    role = new ApplicationRole { Name = ConstantHelpers.ROLES.INDICES[model.Role.Value] };
-                    await _roleRepository.CreateRoleAsync(role);
+                    if (!ConstantHelpers.ROLES.INDICES.TryGetValue(model.Role.Value, out string roleName))
+                        return new OperationDto<UserDetailDto>(OperationCodeDto.Invalid, "El rol proporcionado no es válido.");
+
+                    // Crear rol si no existe
+                    if (!await _roleManager.RoleExistsAsync(roleName))
+                    {
+                        var roleResult = await _roleManager.CreateAsync(new ApplicationRole { Name = roleName });
+                        if (!roleResult.Succeeded)
+                        {
+                            return new OperationDto<UserDetailDto>(
+                                OperationCodeDto.OperationError,
+                                $"No se pudo crear el rol {roleName}: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}"
+                            );
+                        }
+                    }
+
+                    // Obtener roles actuales del usuario
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+
+                    // Remover todos los roles actuales
+                    var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    if (!removeResult.Succeeded)
+                    {
+                        return new OperationDto<UserDetailDto>(
+                            OperationCodeDto.OperationError,
+                            string.Join(", ", removeResult.Errors.Select(e => e.Description))
+                        );
+                    }
+
+                    // Asignar nuevo rol
+                    var addRoleResult = await _userManager.AddToRoleAsync(user, roleName);
+                    if (!addRoleResult.Succeeded)
+                    {
+                        return new OperationDto<UserDetailDto>(
+                            OperationCodeDto.OperationError,
+                            string.Join(", ", addRoleResult.Errors.Select(e => e.Description))
+                        );
+                    }
                 }
 
-                // Actualizar rol
-                await _userRepository.UpdateToRoleAsync(user, role.Name);
-            }
+                // Mapear cambios (Name, LastName, Email, etc.)
+                _mapper.Map(model, user);
 
-            _mapper.Map(model, user);
-            await _userRepository.Update(user);
+                // Actualizar en Identity
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    return new OperationDto<UserDetailDto>(
+                        OperationCodeDto.OperationError,
+                        string.Join(", ", updateResult.Errors.Select(e => e.Description))
+                    );
+                }
 
-            var result = _mapper.Map<UserDetailDto>(user);
+                var result = _mapper.Map<UserDetailDto>(user);
 
-            return new OperationDto<UserDetailDto>(result, "Usuario actualizado correctamente");
+                return new OperationDto<UserDetailDto>(result, "Usuario actualizado correctamente");
+            });
         }
         public async Task<OperationDto<ResponseDto>> DeleteUser(string id, string userLoggedId)
         {
@@ -168,7 +233,7 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
             if (user == null)
                 return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "No existe el usuario.");
 
-            await _userRepository.Delete(user);
+            _userRepository.Delete(user);
 
             return new OperationDto<ResponseDto>
                      (new ResponseDto() { Suceso = true, Mensaje = "Usuario eliminado Correctamente" });

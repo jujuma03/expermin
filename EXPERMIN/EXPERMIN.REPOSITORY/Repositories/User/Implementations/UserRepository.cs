@@ -21,12 +21,6 @@ namespace EXPERMIN.REPOSITORY.Repositories.User.Implementations
         {
             _userManager = userManager;
         }
-        public async Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password)
-        {
-            user.FullName = $"{user.LastName}, {user.Name}";
-            user.NormalizedFullName = user.FullName.ToUpper();
-            return await _userManager.CreateAsync(user, password);
-        }
         public PasswordOptions GetPasswordOptions()
             => _userManager.Options.Password;
         public async Task<ApplicationUser> FindByEmailAsync(string email)
@@ -53,24 +47,6 @@ namespace EXPERMIN.REPOSITORY.Repositories.User.Implementations
             => await _context.Users.AnyAsync(x => x.Id == userId);
         public async Task InsertToRoleAsync(ApplicationUser user, string role)
             => await _userManager.AddToRoleAsync(user, role);
-        public async Task AddToRoleAsync(ApplicationUser user, string role)
-        {
-            var roleContext = await _context.Roles.Where(r => r.Name == role).FirstOrDefaultAsync();
-            var userRole = new ApplicationUserRole()
-            {
-                RoleId = roleContext.Id,
-                UserId = user.Id
-            };
-            await _context.UserRoles.AddAsync(userRole);
-        }
-        public async Task UpdateToRoleAsync(ApplicationUser user, string role)
-        {
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            if (currentRoles.Any())
-                await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-            await _userManager.AddToRoleAsync(user, role);
-        }
         public async Task<List<ApplicationUser>> GetAllUserAsync()
             => await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
         public async Task<ApplicationUser> GetUserById(string id)

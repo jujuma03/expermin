@@ -14,10 +14,24 @@ namespace EXPERMIN.CORE.Helpers
         public static class GENERAL
         {
             public const string PROJECT_URI_BASE = "https://expermin.pe";
-            public static class FILESTORAGE
-            {
-                public const string PATH = "/home/www/files";
-            }
+        }
+        public static class COLOR_PALETTE
+        {
+            public const string ANTHRACITE_GRAY = "#2c3e4f";
+        }
+        public static class FILESTORAGE
+        {
+            public const byte LOCAL = 1;
+            public const byte AZURE = 2;
+            public const byte AMAZONS3 = 3;
+
+            public static Dictionary<int, string> VALUES = new Dictionary<int, string>
+                    {
+                        { LOCAL, "Local" },
+                        { AZURE, "Azure" },
+                        { AMAZONS3, "Amazon S3" }
+                    };
+
         }
         public static class ROLES
         {   //string adminString = ConstantHelpers.ROLES.ADMIN;
@@ -67,26 +81,55 @@ namespace EXPERMIN.CORE.Helpers
         {
             public class STATUS
             {
+
+                //int activeInt = ConstantHelpers.BANNER.STATUS.ACTIVE;
+                //Console.WriteLine(activeInt); // Output: 1
                 public const byte ACTIVE = 1;
                 public const byte HIDDEN = 2;
 
                 public static Dictionary<int, string> VALUES = new Dictionary<int, string>
                     {
-                        { ACTIVE, "Activo" },
-                        { HIDDEN, "Oculto" }
+                        //string activeString = ConstantHelpers.BANNER.STATUS.VALUES[ConstantHelpers.BANNER.STATUS.ACTIVE];
+                        //Console.WriteLine(activeString); // Output: "Activo"
+                        { ACTIVE, "ACTIVO" },
+                        { HIDDEN, "OCULTO" }
                     };
             }
-
-            public class TYPE
+            public class ORDER
             {
-                public const byte INTERNAL = 1;
-                public const byte EXTERNAL = 2;
+                public const byte FIRST = 1;
+                public const byte SECOND = 2;
+                public const byte THIRD = 3;
+                public const byte FOURTH = 4;
+                public const byte FIFTH = 5;
+                public const byte NO_ORDER = 255;
 
                 public static Dictionary<int, string> VALUES = new Dictionary<int, string>
                     {
-                        { INTERNAL, "Interna" },
-                        { EXTERNAL, "Externa" }
+                        { FIRST, "PRIMERO" },
+                        { SECOND, "SEGUNDO" },
+                        { THIRD, "TERCERO" },
+                        { FOURTH, "CUARTO" },
+                        { FIFTH, "QUINTO" },
+                        { NO_ORDER, "SIN ORDEN" }
                     };
+            }
+            public static class BUTTON
+            {
+                public const byte SHOW = 1;
+                public const byte HIDDE = 2;
+
+                public static class TYPE
+                {
+                    public const byte INTERNAL = 1;
+                    public const byte EXTERNAL = 2;
+
+                    public static Dictionary<int, string> VALUES = new Dictionary<int, string>
+                    {
+                        { INTERNAL, "Interno" },
+                        { EXTERNAL, "Externo" }
+                    };
+                }
             }
         }
         public static class SECTION_ITEMS
@@ -1154,35 +1197,6 @@ namespace EXPERMIN.CORE.Helpers
                 }
 
             }
-        }
-        public class SEQUENCE_ORDER
-        {
-            public const byte NINGUNO = 0;
-            public const byte FIRST = 1;
-            public const byte SECOND = 2;
-            public const byte THIRD = 3;
-            public const byte FOURTH = 4;
-            public const byte FIFTH = 5;
-            public const byte SIXTH = 6;
-            public const byte SEVENTH = 7;
-            public const byte EIGHTH = 8;
-            public const byte NINETH = 9;
-            public const byte TENTH = 10;
-
-            public static Dictionary<int, string> VALUES = new Dictionary<int, string>
-                {
-                    { NINGUNO, "Sin Asignar" },
-                    { FIRST, "PRIMERO" },
-                    { SECOND, "SEGUNDO" },
-                    { THIRD, "TERCERO" },
-                    { FOURTH, "CUARTO" },
-                    { FIFTH, "QUINTO" },
-                    { SIXTH, "SEXTO" },
-                    { SEVENTH, "SÉPTIMO" },
-                    { EIGHTH, "OCTAVO" },
-                    { NINETH, "NOVENO" },
-                    { TENTH, "DÉCIMO" },
-                };
         }
         public class DOCUMENT_TYPE
         {

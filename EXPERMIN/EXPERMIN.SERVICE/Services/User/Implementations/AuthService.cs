@@ -5,6 +5,7 @@ using EXPERMIN.SERVICE.Dtos.Generic;
 using EXPERMIN.SERVICE.Dtos.User;
 using EXPERMIN.SERVICE.Security.Interfaces;
 using EXPERMIN.SERVICE.Services.User.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +18,17 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordService _passwordService;
-        private readonly IRoleRepository _roleRepository;
         private readonly IJwtService _jwtService;
-        public AuthService(IUserRepository userRepository, IPasswordService passwordService, IJwtService jwtService, IRoleRepository roleRepository)
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public AuthService(IUserRepository userRepository, IPasswordService passwordService, IJwtService jwtService, 
+            RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _userRepository = userRepository;
             _passwordService = passwordService;
             _jwtService = jwtService;
-            _roleRepository = roleRepository;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
         public async Task<OperationDto<UserLoginResponseDto>> Login(UserLoginDto model)
         {
@@ -47,11 +51,15 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
         public async Task<OperationDto<UserDto>> RegisterAccountAdmin(UserRegisterDto model)
         {
             //Verificar si el rol "Admin" ya existe
-            var adminRole = await _roleRepository.GetRoleByName(ConstantHelpers.ROLES.ADMIN);
-            if (adminRole == null)
+            if (!await _roleManager.RoleExistsAsync(ConstantHelpers.ROLES.ADMIN))
             {
-                adminRole = new ApplicationRole { Name = ConstantHelpers.ROLES.ADMIN };
-                await _roleRepository.AddRoleAsync(adminRole);
+                var roleResult = await _roleManager.CreateAsync(new ApplicationRole
+                {
+                    Name = ConstantHelpers.ROLES.ADMIN
+                });
+
+                if (!roleResult.Succeeded)
+                    return new OperationDto<UserDto>(OperationCodeDto.OperationError, "No se pudo crear el rol Admin");
             }
 
             //Verificar si no existe usuario con ese username
@@ -62,25 +70,37 @@ namespace EXPERMIN.SERVICE.Services.User.Implementations
             if (await _userRepository.AnyByEmail(model.Email))
                 return new OperationDto<UserDto>(OperationCodeDto.AlreadyExists, "Ya existe usuario con ese correo");
 
-            var passwordHash = _passwordService.HashPassword(model.Password);
-
-
             //Crear usuario
             var user = new ApplicationUser
             {
                 UserName = model.UserName,
                 Name = model.Name,
                 LastName = model.LastName,
-                Email = model.Email,
-                PasswordHash = passwordHash
+                Email = model.Email
             };
-            await _userRepository.Add(user);
 
-            //Agregar Rol Admin a Usuario
-            await _userRepository.AddToRoleAsync(user, adminRole.Name);
+            return await _userRepository.ExecuteInTransactionAsync(async () =>
+            {
+                var createUserResult = await _userManager.CreateAsync(user, model.Password);
+                if (!createUserResult.Succeeded)
+                    return new OperationDto<UserDto>(
+                        OperationCodeDto.OperationError,
+                        string.Join(", ", createUserResult.Errors.Select(e => e.Description))
+                    );
 
-            var result = await _userRepository.CreateUserAsync(user, model.Password);
-            return new OperationDto<UserDto>(new UserDto { Id = user.Id, UserName = user.UserName }, "Registro exitoso.");
+                var roleResult = await _userManager.AddToRoleAsync(user, ConstantHelpers.ROLES.ADMIN);
+                if (!roleResult.Succeeded)
+                    return new OperationDto<UserDto>(
+                        OperationCodeDto.OperationError,
+                        string.Join(", ", roleResult.Errors.Select(e => e.Description))
+                    );
+
+                return new OperationDto<UserDto>(
+                    new UserDto { Id = user.Id, UserName = user.UserName },
+                    "Se creó correctamente el usuario."
+                );
+            });
+
         }
         public async Task<OperationDto<ResponseDto>> Logout(string token, string userLoggedId)
         {

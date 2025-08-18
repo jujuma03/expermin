@@ -1,5 +1,7 @@
 using EXPERMIN.WEB.Models;
+using EXPERMIN.WEB.Models.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace EXPERMIN.WEB.Controllers

@@ -144,6 +144,132 @@ namespace EXPERMIN.DATABASE.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Banner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Headline")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MediaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NameDirection")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PublicationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("RouteType")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte?>("SequenceOrder")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("StatusDirection")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UrlDirection")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaFileId")
+                        .IsUnique();
+
+                    b.ToTable("Banners");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.MediaFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsTemporary")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MediaFile");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MediaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte?>("Order")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("PublicationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaFileId")
+                        .IsUnique();
+
+                    b.ToTable("Products");
+                });
+
             modelBuilder.Entity("EXPERMIN.ENTITIES.Models.RevokedToken", b =>
                 {
                     b.Property<int>("Id")
@@ -271,6 +397,28 @@ namespace EXPERMIN.DATABASE.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Banner", b =>
+                {
+                    b.HasOne("EXPERMIN.ENTITIES.Models.MediaFile", "MediaFile")
+                        .WithOne()
+                        .HasForeignKey("EXPERMIN.ENTITIES.Models.Banner", "MediaFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MediaFile");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Product", b =>
+                {
+                    b.HasOne("EXPERMIN.ENTITIES.Models.MediaFile", "MediaFile")
+                        .WithOne()
+                        .HasForeignKey("EXPERMIN.ENTITIES.Models.Product", "MediaFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MediaFile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -1,0 +1,40 @@
+﻿@model List<EXPERMIN.WEB.Models.Portal.Product.ProductViewModel>
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="">
+        <div class="container">
+            <h1 class="toast-title portal-title">Productos</h1>
+            @{
+                var rows = Model.Count() <= 4 ? 1 : Math.Ceiling((decimal)Model.Count() / (decimal)4);
+                var take = Math.Ceiling((decimal)Model.Count() / rows);
+                var size = 12 / take;
+                var col_lg = $"col-lg-{size} col-sm-6 col-xs-12";
+            }
+            @for (int i = 0; i < rows; i++)
+            {
+                var model = Model.Skip((int)take * i).Take((int)take);
+                <div class="row">
+                    <div class="@(model.Count() == 1 ? "col-lg-6" : "col-lg-12")" style="display:contents;margin:@(model.Count() == 1 ? "auto" : "0")">
+                        @foreach (var product in model)
+                        {
+                            <div class="@col_lg">
+                                <div class="m-portlet m-lc-widget">
+                                    <img src="@product.Image.Url" />
+                                    <div class="m--padding-10">
+                                        <span class="lc-headline">
+                                            @product.Title
+                                        </span>
+                                        <div class="lc-description">
+                                            @product.Description
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

@@ -1,28 +1,41 @@
 using EXPERMIN.CORE.Helpers;
+using EXPERMIN.CORE.Services.Implementations;
+using EXPERMIN.CORE.Services.Interfaces;
 using EXPERMIN.DATABASE.Data;
 using EXPERMIN.ENTITIES.Models;
 using EXPERMIN.REPOSITORY.Repositories.Base.Implementations;
 using EXPERMIN.REPOSITORY.Repositories.Base.Interfaces;
 using EXPERMIN.REPOSITORY.Repositories.Jwt;
+using EXPERMIN.REPOSITORY.Repositories.Portal.Implementations;
+using EXPERMIN.REPOSITORY.Repositories.Portal.Interfaces;
+using EXPERMIN.REPOSITORY.Repositories.Storage.Implementations;
+using EXPERMIN.REPOSITORY.Repositories.Storage.Interfaces;
 using EXPERMIN.REPOSITORY.Repositories.User.Implementations;
 using EXPERMIN.REPOSITORY.Repositories.User.Interfaces;
+using EXPERMIN.SERIVICE.Services.Implementations;
+using EXPERMIN.SERIVICE.Services.Interfaces;
 using EXPERMIN.SERVICE.Mappings;
 using EXPERMIN.SERVICE.Security.Implementations;
 using EXPERMIN.SERVICE.Security.Interfaces;
+using EXPERMIN.SERVICE.Services.Portal.Implementations;
+using EXPERMIN.SERVICE.Services.Portal.Interfaces;
 using EXPERMIN.SERVICE.Services.User.Implementations;
 using EXPERMIN.SERVICE.Services.User.Interfaces;
+using EXPERMIN.SERVICE.Storage.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace CLUBACCESS.API
+namespace EXPERMIN.API
 {
     public class Program
     {
@@ -69,11 +82,16 @@ namespace CLUBACCESS.API
                     OnTokenValidated = async context =>
                     {
                         var tokenService = context.HttpContext.RequestServices.GetRequiredService<IJwtService>();
-                        var token = context.SecurityToken as JwtSecurityToken;
 
-                        if (token != null)
+                        // Leer el token directamente del header
+                        var authHeader = context.Request.Headers["Authorization"].ToString();
+                        var rawToken = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length) : null;
+
+                        Console.WriteLine(">>>> Entró a OnTokenValidated con token: " + rawToken);
+
+                        if (rawToken != null)
                         {
-                            bool isRevoked = await tokenService.IsTokenRevoked(token.RawData);
+                            bool isRevoked = await tokenService.IsTokenRevoked(rawToken);
                             if (isRevoked)
                             {
                                 context.Fail("Token revocado.");
@@ -90,6 +108,30 @@ namespace CLUBACCESS.API
             });
             #endregion
 
+            #region STORAGE
+            var storageConfig = builder.Configuration.GetSection("Storage");
+            var provider = storageConfig.GetValue<int>("Provider");
+
+            switch (provider)
+            {
+                case ConstantHelpers.FILESTORAGE.LOCAL:
+                    builder.Services.AddScoped<IFileStorageService, LocalStorageServices>();
+                    break;
+                case ConstantHelpers.FILESTORAGE.AZURE:
+                    //builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+                    break;
+                case ConstantHelpers.FILESTORAGE.AMAZONS3:
+                    //builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+                    break;
+                default: // Local
+                    builder.Services.AddScoped<IFileStorageService, LocalStorageServices>();
+                    break;
+            };
+
+            builder.Services.Configure<StorageOptions>(
+                 builder.Configuration.GetSection("Storage:Local"));
+
+            #endregion
             #region REPOSITORY / SERVICE
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IJwtRepository, JwtRepository>();
@@ -99,8 +141,19 @@ namespace CLUBACCESS.API
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserServices>();
-
+            builder.Services.AddScoped<IUserValidationService, UserValidationService>();
+            
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+
+            builder.Services.AddScoped<IBannerRepository, BannerRepository>();
+            builder.Services.AddScoped<IBannerService, BannerService>();
+
+            builder.Services.AddScoped<IMediaFileRepository, MediaFileRepository>();
+            builder.Services.AddScoped<IMediaFileService, MediaFileService>();
+            builder.Services.AddScoped<IFileValidatorServices, FileValidatorServices>();
+
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             builder.Services.AddHttpContextAccessor();
 
@@ -137,6 +190,22 @@ namespace CLUBACCESS.API
 
             app.UseHttpsRedirection();
             app.UseRouting();
+
+            // Servir archivos estáticos desde el storage local
+            var localStoragePath = builder.Configuration.GetSection("Storage:Local:BasePath").Value;
+            if (!string.IsNullOrEmpty(localStoragePath))
+            {
+                var absolutePath = Path.GetFullPath(localStoragePath);
+                if (!Directory.Exists(absolutePath))
+                    Directory.CreateDirectory(absolutePath);
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(localStoragePath),
+                    RequestPath = "/uploads" // URL pública -> https://localhost:7020/uploads/...
+                });
+            }
+
 
             app.UseAuthentication();
             app.UseAuthorization();

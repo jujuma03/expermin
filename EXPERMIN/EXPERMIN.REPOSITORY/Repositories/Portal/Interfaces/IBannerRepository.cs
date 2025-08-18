@@ -10,5 +10,6 @@ namespace EXPERMIN.REPOSITORY.Repositories.Portal.Interfaces
 {
     public interface IBannerRepository : IRepository<Banner>
     {
+        Task<Banner> GetBannerDetail(Guid id);
     }
 }

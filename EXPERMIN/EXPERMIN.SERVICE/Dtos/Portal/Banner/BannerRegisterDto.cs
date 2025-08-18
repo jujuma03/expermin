@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using EXPERMIN.SERVICE.Dtos.Portal.MediFile;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,38 +12,36 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Banner
 {
     public class BannerRegisterDto
     {
-        [Required(ErrorMessage = "El {0} es requerido")]
-        [JsonPropertyName("id")]
-        public Guid Id { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
+        [Required(ErrorMessage = "El TITULAR es requerido")]
         [JsonPropertyName("headline")]
         public string Headline { get; set; }
-        [JsonPropertyName("Description")]
+
+        [JsonPropertyName("description")]
         public string Description { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
-        [JsonPropertyName("publicationDate")]
-        public string PublicationDate { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
+
+        [Required(ErrorMessage = "El ESTADO(1 = MOSTRAR, 2 = NO MOSTRAR) es requerido")]
         [JsonPropertyName("status")]
-        public string Status { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
+        public int Status { get; set; }
+
+        [Required(ErrorMessage = "El TIPO DE RUTA DEL BOTÓN(1 = INTERNO, 2 = EXTERNO) es requerido")]
         [JsonPropertyName("routeType")]
-        public string RouteType { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
-        [JsonPropertyName("urlImage")]
-        public string UrlImage { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
+        public int RouteType { get; set; }
+
+        [Required(ErrorMessage = "El ORDEN DEL BANNER es requerido")]
         [JsonPropertyName("sequenceOrder")]
-        public string SequenceOrder { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
+        public int SequenceOrder { get; set; }
+
         [JsonPropertyName("urlDirection")]
         public string UrlDirection { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
+
+        [Required(ErrorMessage = "El MOSTRAR BOTÓN(1 = SÍ, 2 = NO) es requerido")]
         [JsonPropertyName("statusDirection")]
-        public string StatusDirection { get; set; }
+        public int StatusDirection { get; set; }
+
         [JsonPropertyName("nameDirection")]
         public string NameDirection { get; set; }
-        [Required(ErrorMessage = "El {0} es requerido")]
-        public IFormFile Image { get; set; }
+
+        [JsonPropertyName("imageId")]
+        public Guid ImageId { get; set; }
     }
 }

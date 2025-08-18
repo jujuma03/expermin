@@ -46,8 +46,46 @@ namespace EXPERMIN.DATABASE.Data
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Banner 1:1 MediaFile
+            modelBuilder.Entity<Banner>()
+                .HasOne(b => b.MediaFile)
+                .WithOne()
+                .HasForeignKey<Banner>(b => b.MediaFileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Producto 1:1 MediaFile
+            modelBuilder.Entity<Product>()
+                .HasOne(b => b.MediaFile)
+                .WithOne()
+                .HasForeignKey<Product>(b => b.MediaFileId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker.Entries<BaseEntity>();
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedDate = DateTime.UtcNow;
+                    entry.Entity.UpdatedDate = DateTime.UtcNow;
+                    // Aquí podrías setear CreatedBy desde el contexto del usuario
+                }
+
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedDate = DateTime.UtcNow;
+                    // Aquí podrías setear UpdatedBy desde el contexto del usuario
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
+        public DbSet<Banner> Banners { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
     }
 }

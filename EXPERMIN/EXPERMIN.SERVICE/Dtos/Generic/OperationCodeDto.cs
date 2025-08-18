@@ -22,6 +22,7 @@ namespace EXPERMIN.SERVICE.Dtos.Generic
         InvalidInput,
         Unauthorized,
         AlreadyExists,
-        Forbidden
+        Forbidden,
+        OperationError
     }
 }

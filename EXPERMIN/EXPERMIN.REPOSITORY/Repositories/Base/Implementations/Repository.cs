@@ -39,15 +39,12 @@ namespace EXPERMIN.REPOSITORY.Repositories.Base.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task Update(T entity)
+        public void Update(T entity)
         {
             if (entity == null)
-            {
-                // Should call Dispose() to remove the elements from the failed context?
                 throw new ArgumentNullException(nameof(entity));
-            }
 
-            await _context.SaveChangesAsync();
+            _context.Set<T>().Update(entity); // Marca como modificado, no guarda aún
         }
 
         public async Task UpdateRange(IEnumerable<T> entities)
@@ -68,11 +65,18 @@ namespace EXPERMIN.REPOSITORY.Repositories.Base.Implementations
         {
             await _entity.AddRangeAsync(entities);
         }
-
-        public async Task Delete(T entity)
+        public void Attach(T entity)
         {
-            _entity.Remove(entity);
-            await _context.SaveChangesAsync();
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            _context.Set<T>().Attach(entity);
+        }
+
+        public void Delete(T entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            _context.Set<T>().Remove(entity); // Marca para eliminar, no guarda aún
         }
 
         public async Task DeleteRange(IEnumerable<T> entities)
@@ -83,5 +87,42 @@ namespace EXPERMIN.REPOSITORY.Repositories.Base.Implementations
 
         public IQueryable<T> GetAsQueryable()
             => _entity.AsQueryable();
+
+        /// <summary>
+        /// Ejecuta múltiples operaciones dentro de una transacción.
+        /// Si algo falla, hace rollback.
+        /// </summary>
+        public async Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> action)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var result = await action();
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw; // repropaga el error
+            }
+        }
+        public async Task<T> ExecuteInTransactionWithSaveAsync<T>(Func<Task<T>> action) 
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var result = await action();
+                await _context.SaveChangesAsync(); // centralizado aquí
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
     }
 }

@@ -67,7 +67,7 @@ namespace EXPERMIN.SERVICE.Security.Implementations
                 return false;
             var expiration = jwtToken.ValidTo;
 
-            await _jwtRepository.Add(new RevokedToken { Token = token, Expiration = expiration });
+            await _jwtRepository.Insert(new RevokedToken { Token = token, Expiration = expiration });
 
             return true;
         }

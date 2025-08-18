@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace EXPERMIN.ENTITIES.Models
 {
-    public class Banner
+    public class Banner : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Headline { get; set; }
         public string Description { get; set; }
-        public DateTime PublicationDate { get; set; }
-        public byte Status { get; set; }
+        public DateTime PublicationDate { get; set; } //se actualiza cuando lo pones a estado "Activo"
+        public byte Status { get; set; } // activo = 1, oculto = 2
         public byte RouteType { get; set; }
-        public string UrlImage { get; set; }
+        public Guid MediaFileId { get; set; }
+        public MediaFile MediaFile { get; set; }
         public byte? SequenceOrder { get; set; }
         public string UrlDirection { get; set; }
         public byte StatusDirection { get; set; }
