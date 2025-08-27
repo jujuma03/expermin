@@ -5,6 +5,7 @@ using EXPERMIN.ENTITIES.Models;
 using EXPERMIN.REPOSITORY.Repositories.Portal.Implementations;
 using EXPERMIN.REPOSITORY.Repositories.Portal.Interfaces;
 using EXPERMIN.REPOSITORY.Repositories.Storage.Interfaces;
+using EXPERMIN.SERIVICE.Services.Interfaces;
 using EXPERMIN.SERVICE.Dtos.Generic;
 using EXPERMIN.SERVICE.Dtos.Portal.MediFile;
 using EXPERMIN.SERVICE.Dtos.Portal.Product;
@@ -20,19 +21,21 @@ using static EXPERMIN.CORE.Helpers.ConstantHelpers;
 
 namespace EXPERMIN.SERVICE.Services.Portal.Implementations
 {
-    public class ProductService: IProductService
+    public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
         private readonly IUserValidationService _userValidationService;
         private readonly IMapper _mapper;
         private readonly IMediaFileRepository _mediaFileRepository;
+        private readonly IFileStorageService _fileStorageService;
         public ProductService(IProductRepository productRepository, IUserValidationService userValidationService, IMapper mapper,
-            IMediaFileRepository mediaFileRepository)
+            IMediaFileRepository mediaFileRepository, IFileStorageService fileStorageService)
         {
             _productRepository = productRepository;
             _userValidationService = userValidationService;
             _mapper = mapper;
             _mediaFileRepository = mediaFileRepository;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<OperationDto<List<ProductDto>>> GetAllProductsActive()
@@ -40,14 +43,19 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
             var products = await _productRepository
                 .GetAsQueryable()
                 .AsNoTracking()
-                .Where(x => x.Status == ConstantHelpers.BANNER.STATUS.ACTIVE)
+                .Where(x => x.Status == ConstantHelpers.PRODUCT.STATUS.ACTIVE)
                 .Select(x => new ProductDto
                 {
                     Id = x.Id.ToString(),
                     Title = x.Title,
                     PublicationDate = x.PublicationDate.ToLocalDateTimeFormat(),
-                    Status = ConstantHelpers.BANNER.STATUS.VALUES[x.Status],
-                    Order = x.Order ?? 0,
+                    StatusId = x.Status,
+                    Status = ConstantHelpers.PRODUCT.STATUS.VALUES[x.Status],
+                    OrderId = x.Order ?? 0,
+                    Order = (x.Order.HasValue && x.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[x.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                    ShortDescription = x.Description,
                     Description = x.Description,
                     Image = x.MediaFile == null ? null : new MediaFileDto
                     {
@@ -83,8 +91,13 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                     Id = x.Id.ToString(),
                     Title = x.Title,
                     PublicationDate = x.PublicationDate.ToLocalDateTimeFormat(),
-                    Status = ConstantHelpers.BANNER.STATUS.VALUES[x.Status],
-                    Order = x.Order ?? 0,
+                    StatusId = x.Status,
+                    Status = ConstantHelpers.PRODUCT.STATUS.VALUES[x.Status],
+                    OrderId = x.Order ?? 0,
+                    Order = (x.Order.HasValue && x.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[x.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                    ShortDescription = x.Description,
                     Description = x.Description,
                     Image = x.MediaFile == null ? null : new MediaFileDto
                     {
@@ -101,7 +114,7 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 .ToListAsync();
 
             if (!products.Any())
-                return new OperationDto<List<ProductDto>>(OperationCodeDto.EmptyResult, "No hay productos activos.");
+                return new OperationDto<List<ProductDto>>(OperationCodeDto.EmptyResult, "No hay productos registrados.");
 
             return new OperationDto<List<ProductDto>>(products);
         }
@@ -126,8 +139,13 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 Id = product.Id.ToString(),
                 Title = product.Title,
                 PublicationDate = product.PublicationDate.ToLocalDateTimeFormat(),
-                Status = ConstantHelpers.BANNER.STATUS.VALUES[product.Status],
-                Order = product.Order ?? 0,
+                StatusId = product.Status,
+                Status = ConstantHelpers.PRODUCT.STATUS.VALUES[product.Status],
+                OrderId = product.Order ?? 0,
+                Order = (product.Order.HasValue && product.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[product.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                ShortDescription = product.Description,
                 Description = product.Description,
                 Image = product.MediaFile == null ? null : new MediaFileDto
                 {
@@ -151,7 +169,7 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
 
             var product = await _productRepository.GetProductDetail(id);
 
-            if (product == null || product.Status == ConstantHelpers.BANNER.STATUS.HIDDEN)
+            if (product == null || product.Status == ConstantHelpers.PRODUCT.STATUS.HIDDEN)
                 return new OperationDto<ProductDto>(OperationCodeDto.DoesNotExist, "El producto no existe.");
 
             var dto = new ProductDto
@@ -159,8 +177,13 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 Id = product.Id.ToString(),
                 Title = product.Title,
                 PublicationDate = product.PublicationDate.ToLocalDateTimeFormat(),
-                Status = ConstantHelpers.BANNER.STATUS.VALUES[product.Status],
-                Order = product.Order ?? 0,
+                StatusId = product.Status,
+                Status = ConstantHelpers.PRODUCT.STATUS.VALUES[product.Status],
+                OrderId = product.Order ?? 0,
+                Order = (product.Order.HasValue && product.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[product.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                ShortDescription = product.Description,
                 Description = product.Description,
                 Image = product.MediaFile == null ? null : new MediaFileDto
                 {
@@ -197,10 +220,22 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
             if (image == null)
                 return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "No existe la imagen adjuntada al product.");
 
+            // Validar que pueda insertar el producto en la orden indicada
+            var productActive = await GetAllProductsActive();
+            if (productActive?.Result?.Any(b => b.OrderId == model.Order) == true)
+                return new OperationDto<ResponseDto>(OperationCodeDto.OperationError, "Ya hay otro producto en esa posición/orden de visualización.");
+
+            // si lo inserta como oculto, no debería tener orden
+            if (model.Status == ConstantHelpers.PRODUCT.STATUS.HIDDEN || model.Status == 0)
+                model.Order = ConstantHelpers.ORDER.NO_ORDER;
+            // si lo inserta sin orden, debería ser oculto
+            if (model.Order == ConstantHelpers.ORDER.NO_ORDER || model.Order == 0)
+                model.Status = ConstantHelpers.PRODUCT.STATUS.HIDDEN;
 
             var product = new Product()
             {
                 Description = model.Description,
+                ShortDescription = model.ShortDescription,
                 Title = model.Title,
                 Status = (byte)model.Status,
                 PublicationDate = DateTime.UtcNow,
@@ -214,7 +249,13 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
             {
                 await _productRepository.Add(product);
 
+                var fileName = Path.GetFileName(image.Path); // mismo nombre del archivo
+                // Mover de Temporales → banners
+                var (newPath, newUrl) = await _fileStorageService.MoveFileAsync(image.Path, "products", fileName);
+
                 // Actualizar imagen
+                image.Path = newPath;
+                image.Url = newUrl;
                 image.IsTemporary = false;
                 _mediaFileRepository.Attach(image);
 
@@ -238,31 +279,50 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
             if (product == null)
                 return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "El producto no existe.");
 
-            
-            // Si quiere ocultarlo, colocar la orden en 0 por defecto
-            if (model.Status == ConstantHelpers.BANNER.STATUS.HIDDEN)
-                model.Order = 0;
+            // Validar que no se repita el orden
+            var productActive = await GetAllProductsActive();
+            if (productActive?.Result?.Any(b => b.OrderId == model.Order) == true)
+                return new OperationDto<ResponseDto>(OperationCodeDto.OperationError, "Ya hay otro producto en esa posición/orden de visualización.");
+
+            // si lo actualiza como oculto, no debería tener orden
+            if (model.Status == ConstantHelpers.PRODUCT.STATUS.HIDDEN)
+                model.Order = ConstantHelpers.ORDER.NO_ORDER;
+            // si lo actualiza sin orden, debería ser oculto
+            if (model.Order == ConstantHelpers.ORDER.NO_ORDER)
+                model.Status = ConstantHelpers.PRODUCT.STATUS.HIDDEN;
 
             Guid? oldImageId = null;
 
             // Mapear resto de propiedades (menos la imagen, que manejamos manualmente)
             _mapper.Map(model, product);
 
-            // Si viene imagen nueva diferente a la actual → swap
-            if (model.ImageId.HasValue && model.ImageId.Value != product.MediaFileId)
-            {
-                // Verificar que el nuevo MediaFile exista
-                var newImage = await _mediaFileRepository.Get(model.ImageId.Value);
-                if (newImage == null)
-                    return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "La nueva imagen no existe en el sistema.");
-
-                oldImageId = product.MediaFileId;
-                product.MediaFileId = model.ImageId.Value;
-            }
-
             return await _productRepository.ExecuteInTransactionWithSaveAsync(async () =>
             {
-                // Guardar cambios del banner
+                // Si viene imagen nueva diferente a la actual → swap
+                if (model.ImageId.HasValue && model.ImageId.Value != product.MediaFileId)
+                {
+                    // Verificar que el nuevo MediaFile exista
+                    var newImage = await _mediaFileRepository.Get(model.ImageId.Value);
+                    if (newImage == null)
+                        return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "La nueva imagen no existe en el sistema.");
+
+                    // mover archivo desde Temporales → product
+                    var fileName = Path.GetFileName(newImage.Path);
+                    var (newPath, newUrl) = await _fileStorageService.MoveFileAsync(newImage.Path, "products", fileName);
+
+                    newImage.Path = newPath;
+                    newImage.Url = newUrl;
+                    newImage.IsTemporary = false;
+
+                    // actualizar product con la nueva imagen
+                    oldImageId = product.MediaFileId;
+                    product.MediaFileId = newImage.Id;
+
+                    // actulizar imagen
+                    _mediaFileRepository.Update(newImage);
+                }
+
+                // Guardar cambios del product
                 _productRepository.Update(product);
 
                 // Eliminar imagen antigua
@@ -270,9 +330,11 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 {
                     var oldImage = await _mediaFileRepository.Get(oldImageId.Value);
                     if (oldImage != null)
+                    {
+                        await _fileStorageService.DeleteFileAsync(oldImage.Path);
                         _mediaFileRepository.Delete(oldImage);
+                    }
                 }
-
                 return new OperationDto<ResponseDto>(new ResponseDto() { Suceso = true, Mensaje = "Producto actualizado Correctamente" });
             });
         }
@@ -292,13 +354,16 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
             // Transacción
             return await _productRepository.ExecuteInTransactionWithSaveAsync(async () =>
             {
-                // Eliminar banner
+                // Eliminar product
                 _productRepository.Delete(product);
 
                 // Eliminar mediaFile asociado
                 var mediaFile = await _mediaFileRepository.Get(product.MediaFileId);
                 if (mediaFile != null)
+                {
+                    await _fileStorageService.DeleteFileAsync(mediaFile.Path);
                     _mediaFileRepository.Delete(mediaFile);
+                }
 
                 return new OperationDto<ResponseDto>(
                     new ResponseDto()

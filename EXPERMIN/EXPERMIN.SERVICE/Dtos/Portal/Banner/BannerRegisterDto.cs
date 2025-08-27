@@ -28,8 +28,8 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Banner
         public int RouteType { get; set; }
 
         [Required(ErrorMessage = "El ORDEN DEL BANNER es requerido")]
-        [JsonPropertyName("sequenceOrder")]
-        public int SequenceOrder { get; set; }
+        [JsonPropertyName("order")]
+        public int Order { get; set; }
 
         [JsonPropertyName("urlDirection")]
         public string UrlDirection { get; set; }

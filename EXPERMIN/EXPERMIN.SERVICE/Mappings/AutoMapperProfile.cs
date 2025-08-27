@@ -2,8 +2,10 @@
 using EXPERMIN.CORE.Extensions;
 using EXPERMIN.ENTITIES.Models;
 using EXPERMIN.SERVICE.Dtos.Portal.Banner;
+using EXPERMIN.SERVICE.Dtos.Portal.Collaborator;
 using EXPERMIN.SERVICE.Dtos.Portal.MediFile;
 using EXPERMIN.SERVICE.Dtos.Portal.Product;
+using EXPERMIN.SERVICE.Dtos.Portal.Testimony;
 using EXPERMIN.SERVICE.Dtos.Role;
 using EXPERMIN.SERVICE.Dtos.User;
 using System;
@@ -55,9 +57,9 @@ namespace EXPERMIN.SERVICE.Mappings
                     opt => opt.Condition(src => src.RouteType.HasValue))
                 .ForMember(dest => dest.StatusDirection,
                     opt => opt.Condition(src => src.StatusDirection.HasValue))
-                .ForMember(dest => dest.SequenceOrder,
+                .ForMember(dest => dest.Order,
                     opt => opt.MapFrom((src, dest) =>
-                        src.SequenceOrder.HasValue ? (byte?)src.SequenceOrder.Value : dest.SequenceOrder))
+                        src.Order.HasValue ? (byte?)src.Order.Value : dest.Order))
                 .ForMember(dest => dest.UrlDirection,
                     opt => opt.Condition(src => src.UrlDirection != null))
                 .ForMember(dest => dest.NameDirection,
@@ -67,22 +69,45 @@ namespace EXPERMIN.SERVICE.Mappings
                 .ForMember(dest => dest.Description,
                     opt => opt.Condition(src => src.Description != null));
 
-
-
-
-
-
-
             CreateMap<MediaFile, MediaFileDto>()
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadDate.ToLocalDateTimeFormat()))
                 .ReverseMap()
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => DateTime.Parse(src.UploadDate)));
 
             CreateMap<ProductUpdateDto, Product>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Convert.ToByte(src.Status)))
-                .ForMember(dest => dest.Order, opt => opt.MapFrom(src => (byte?)src.Order))
-                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+                .ForMember(dest => dest.Status,
+                    opt => opt.Condition(src => src.Status.HasValue))
+                .ForMember(dest => dest.Order,
+                    opt => opt.MapFrom((src, dest) =>
+                        src.Order.HasValue ? (byte?)src.Order.Value : dest.Order))
+                .ForMember(dest => dest.Description,
+                    opt => opt.Condition(src => src.Description != null))
+                .ForMember(dest => dest.ShortDescription,
+                    opt => opt.Condition(src => src.ShortDescription != null))
+                .ForMember(dest => dest.Title,
+                    opt => opt.Condition(src => src.Title != null));
 
+            CreateMap<TestimonyUpdateDto, Testimony>()
+                .ForMember(dest => dest.Status,
+                    opt => opt.Condition(src => src.Status.HasValue))
+                .ForMember(dest => dest.Order,
+                    opt => opt.MapFrom((src, dest) =>
+                        src.Order.HasValue ? (byte?)src.Order.Value : dest.Order))
+                .ForMember(dest => dest.Rating,
+                    opt => opt.Condition(src => src.Rating.HasValue))
+                .ForMember(dest => dest.Comment,
+                    opt => opt.Condition(src => src.Comment != null))
+                .ForMember(dest => dest.ClientName,
+                    opt => opt.Condition(src => src.ClientName != null));
+
+            CreateMap<CollaboratorUpdateDto, Collaborator>()
+                .ForMember(dest => dest.Status,
+                    opt => opt.Condition(src => src.Status.HasValue))
+                .ForMember(dest => dest.Order,
+                    opt => opt.MapFrom((src, dest) =>
+                        src.Order.HasValue ? (byte?)src.Order.Value : dest.Order))
+                .ForMember(dest => dest.Name,
+                    opt => opt.Condition(src => src.Name != null));
         }
     }
 }

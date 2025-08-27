@@ -1,40 +1,51 @@
 ﻿@model List<EXPERMIN.WEB.Models.Portal.Product.ProductViewModel>
 
-@if (Model != null && Model.Count() > 0)
+@if (Model != null && Model.Any())
 {
-    <div class="">
-        <div class="container">
-            <h1 class="toast-title portal-title">Productos</h1>
-            @{
-                var rows = Model.Count() <= 4 ? 1 : Math.Ceiling((decimal)Model.Count() / (decimal)4);
-                var take = Math.Ceiling((decimal)Model.Count() / rows);
-                var size = 12 / take;
-                var col_lg = $"col-lg-{size} col-sm-6 col-xs-12";
-            }
-            @for (int i = 0; i < rows; i++)
-            {
-                var model = Model.Skip((int)take * i).Take((int)take);
-                <div class="row">
-                    <div class="@(model.Count() == 1 ? "col-lg-6" : "col-lg-12")" style="display:contents;margin:@(model.Count() == 1 ? "auto" : "0")">
-                        @foreach (var product in model)
+    <section class="m-section m-section--gray m-section-banner">
+        <div class="m-section-banner__content">
+            <div class="m-container m-container--responsive m-container--xxl m-page__container portal-testimonials">
+
+                <!-- Header de sección -->
+                <div class="portal-header mb-5 mt-5 ml-5">
+                    <h5 class="portal-section">PRODUCTOS</h5>
+                    <h1 class="portal-subtitle">Explora nuestras opciones</h1>
+                </div>
+
+                <div class="m-section-banner__content-link-group">
+                    <div class="owl-carousel owl-theme carousel-products-owl">
+                        @foreach (var item in Model.OrderBy(i => i.Order))
                         {
-                            <div class="@col_lg">
-                                <div class="m-portlet m-lc-widget">
-                                    <img src="@product.Image.Url" />
-                                    <div class="m--padding-10">
-                                        <span class="lc-headline">
-                                            @product.Title
-                                        </span>
-                                        <div class="lc-description">
-                                            @product.Description
-                                        </div>
+                            <div class="item">
+                                <div class="products-card m-portlet m-portlet--bordered m-portlet--rounded m-portlet--hover">
+                                    <div class="products-avatar">
+                                        @if (!string.IsNullOrEmpty(item.Image?.Url))
+                                        {
+                                            <img src="@item.Image.FullUrl" alt="@($"{item.Title} - foto")" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/general/profile.jpg" alt="Foto de perfil" />
+                                        }
                                     </div>
+
+                                    <h3 class="testimonial-name">@item.Title?.ToUpper()</h3>
+
+                                    <blockquote class="products-quote-quote">
+                                        <span>@item.Description</span>
+                                    </blockquote>
                                 </div>
                             </div>
                         }
                     </div>
                 </div>
-            }
+
+            </div>
+            <div class="d-flex justify-content-center mb-5">
+                <a class="btn btn-lg btn-lc-gray m-btn--pill" href="#">
+                    VER CAT&Aacute;LOGO
+                </a>
+            </div>
         </div>
-    </div>
+    </section>
 }

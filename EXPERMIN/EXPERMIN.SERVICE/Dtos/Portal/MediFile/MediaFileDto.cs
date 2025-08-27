@@ -32,5 +32,6 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.MediFile
 
         [JsonPropertyName("isTemporary")] 
         public bool IsTemporary { get; set; }    // true = aún no referenciado
+
     }
 }

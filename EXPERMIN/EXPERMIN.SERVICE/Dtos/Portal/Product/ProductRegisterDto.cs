@@ -11,13 +11,16 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Product
     public class ProductRegisterDto
     {
         [Required(ErrorMessage = "El TITULO es requerido")]
-        [JsonPropertyName("headline")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
+
+        [JsonPropertyName("shortDescription")]
+        public string ShortDescription { get; set; }
 
         [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [Required(ErrorMessage = "El ESTADO(1 = MOSTRAR, 0 = NO MOSTRAR) es requerido")]
+        [Required(ErrorMessage = "El ESTADO(1 = MOSTRAR, 2 = NO MOSTRAR) es requerido")]
         [JsonPropertyName("status")]
         public int Status { get; set; }
 

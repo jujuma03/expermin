@@ -17,7 +17,10 @@ namespace EXPERMIN.CORE.Helpers
         }
         public static class COLOR_PALETTE
         {
-            public const string ANTHRACITE_GRAY = "#2c3e4f";
+            public const string EMERALD_GREEN = "#007D5E";
+            public const string OPAQUE_GOLD = "#B4A76C";
+            public const string ANTHRACITE_GRAY = "#2C3E4F";
+            public const string NEUTRAL_BEIGE = "#E8E3D9";
         }
         public static class FILESTORAGE
         {
@@ -95,25 +98,6 @@ namespace EXPERMIN.CORE.Helpers
                         { HIDDEN, "OCULTO" }
                     };
             }
-            public class ORDER
-            {
-                public const byte FIRST = 1;
-                public const byte SECOND = 2;
-                public const byte THIRD = 3;
-                public const byte FOURTH = 4;
-                public const byte FIFTH = 5;
-                public const byte NO_ORDER = 255;
-
-                public static Dictionary<int, string> VALUES = new Dictionary<int, string>
-                    {
-                        { FIRST, "PRIMERO" },
-                        { SECOND, "SEGUNDO" },
-                        { THIRD, "TERCERO" },
-                        { FOURTH, "CUARTO" },
-                        { FIFTH, "QUINTO" },
-                        { NO_ORDER, "SIN ORDEN" }
-                    };
-            }
             public static class BUTTON
             {
                 public const byte SHOW = 1;
@@ -131,6 +115,92 @@ namespace EXPERMIN.CORE.Helpers
                     };
                 }
             }
+        }
+        public static class PRODUCT
+        {
+            public class STATUS
+            {
+
+                //int activeInt = ConstantHelpers.BANNER.STATUS.ACTIVE;
+                //Console.WriteLine(activeInt); // Output: 1
+                public const byte ACTIVE = 1;
+                public const byte HIDDEN = 2;
+
+                public static Dictionary<int, string> VALUES = new Dictionary<int, string>
+                    {
+                        //string activeString = ConstantHelpers.BANNER.STATUS.VALUES[ConstantHelpers.BANNER.STATUS.ACTIVE];
+                        //Console.WriteLine(activeString); // Output: "Activo"
+                        { ACTIVE, "ACTIVO" },
+                        { HIDDEN, "OCULTO" }
+                    };
+            }
+        }
+        public static class TESTIMONY
+        {
+            public class STATUS
+            {
+
+                //int activeInt = ConstantHelpers.BANNER.STATUS.ACTIVE;
+                //Console.WriteLine(activeInt); // Output: 1
+                public const byte ACTIVE = 1;
+                public const byte HIDDEN = 2;
+
+                public static Dictionary<int, string> VALUES = new Dictionary<int, string>
+                    {
+                        //string activeString = ConstantHelpers.BANNER.STATUS.VALUES[ConstantHelpers.BANNER.STATUS.ACTIVE];
+                        //Console.WriteLine(activeString); // Output: "Activo"
+                        { ACTIVE, "ACTIVO" },
+                        { HIDDEN, "OCULTO" }
+                    };
+            }
+        }
+        public static class COLLABORATOR
+        {
+            public class STATUS
+            {
+
+                //int activeInt = ConstantHelpers.BANNER.STATUS.ACTIVE;
+                //Console.WriteLine(activeInt); // Output: 1
+                public const byte ACTIVE = 1;
+                public const byte HIDDEN = 2;
+
+                public static Dictionary<int, string> VALUES = new Dictionary<int, string>
+                    {
+                        //string activeString = ConstantHelpers.BANNER.STATUS.VALUES[ConstantHelpers.BANNER.STATUS.ACTIVE];
+                        //Console.WriteLine(activeString); // Output: "Activo"
+                        { ACTIVE, "ACTIVO" },
+                        { HIDDEN, "OCULTO" }
+                    };
+            }
+        }
+        public class ORDER
+        {
+            public const byte NO_ORDER = 255;
+            public const byte FIRST = 1;
+            public const byte SECOND = 2;
+            public const byte THIRD = 3;
+            public const byte FOURTH = 4;
+            public const byte FIFTH = 5;
+            public const byte SIXTH = 6;
+            public const byte SEVENTH = 7;
+            public const byte EIGHTH = 8;
+            public const byte NINETH = 9;
+            public const byte TENTH = 10;
+
+            public static Dictionary<int, string> VALUES = new Dictionary<int, string>
+                {
+                    { NO_ORDER, "SIN ORDEN" },
+                    { FIRST, "PRIMERO" },
+                    { SECOND, "SEGUNDO" },
+                    { THIRD, "TERCERO" },
+                    { FOURTH, "CUARTO" },
+                    { FIFTH, "QUINTO" },
+                    { SIXTH, "SEXTO" },
+                    { SEVENTH, "SÉPTIMO" },
+                    { EIGHTH, "OCTAVO" },
+                    { NINETH, "NOVENO" },
+                    { TENTH, "DÉCIMO" },
+                };
         }
         public static class SECTION_ITEMS
         {

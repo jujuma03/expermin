@@ -19,19 +19,19 @@
                 @{
                     var count = 1;
                 }
-                @foreach (var item in Model.Banner.OrderBy(i => i.SequenceOrderId))
+                @foreach (var item in Model.Banner.OrderBy(i => i.Order))
                 {
                     <div class="carousel-item @(count == 1 ? "active" : string.Empty)">
-                        <img class="img-fluid d-block w-100" src="@item.Image?.Url" alt="@item.Headline" slide />
+                        <img class="img-fluid d-block w-100" src="@item.Image.FullUrl" alt="@item.Headline" slide />
                         <div class="carousel-caption">
                             <div class="carousel-caption-container">
                                 <div class="row">
                                     <div class="col-12 col-md-6" style="margin:auto;text-align:center">
                                         <div class="inner-parallax">
                                             <div class="" style="text-align:center">
-                                                <h1>@item.Headline</h1>
+                                                <h1 style="color:beige;">@item.Headline</h1>
                                                 <div class="text-center">
-                                                    <a class="btn btn-lg btn-lc-green m-btn--pill" target="_blank" href="@(item.RouteType? item.UrlDirection: $"//{item.UrlDirection}")"> @item.NameDirection</a>
+                                                    <a class="btn btn-lg btn-lc-gold m-btn--pill" target="_blank" href="@(item.RouteType? item.UrlDirection: $"//{item.UrlDirection}")"> @item.NameDirection</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -46,58 +46,97 @@
                 }
             </div>
             <div class="m-container m-container--responsive m-container--xxl m-page__container" style="position: absolute; z-index: 9998;">
-                <span class="m-main-carousel__indicators h4">
-                    <span class="m-main-carousel__indicators-page">1</span>
-                    <span id="totalCount" class="m-main-carousel__indicators-total">/@Model.Banner.Count()</span>
-                </span>
-                <a class="btn btn-secondary btn-slider-prev m-btn--icon-only prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <a class="btn btn-secondary banner btn-slider-prev m-btn--icon-only prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
                     <i class="fas fa-angle-left"></i>
                 </a>
-                <a class="btn btn-secondary btn-slider-next m-btn--icon-only next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <a class="btn btn-secondary banner btn-slider-next m-btn--icon-only next" href="#carouselExampleIndicators" role="button" data-slide="next">
                     <i class="fas fa-angle-right"></i>
                 </a>
             </div>
         </div>
     </section>
 }
+
 <!------------------------------------------------------------ FIN: BANNER ------------------------------------------------------------>
 <!------------------------------------------------------------ INICIO: PRODUCTOS ------------------------------------------------------------>
-<div id="products">
+<div id="products" style="background-color:#e8e3d926;">
     <div class="loading">Cargando productos...</div>
 </div>
-<div class="d-flex justify-content-center">
-    <a class="btn btn-lg btn-lc-transparent m-btn--pill" href="#">
-        VER CAT&Aacute;LOGO
-    </a>
-</div>
+
+
 <!------------------------------------------------------------ FIN: PRODUCTOS ------------------------------------------------------------>
+
 <!------------------------------------------------------------ INICIO: NOSOTROS ------------------------------------------------------------>
-<!------------------------------------------------------------ FIN: NOSOTROS ------------------------------------------------------------>
-<!------------------------------------------------------------ INICIO: TESTIMONIOS ------------------------------------------------------------>
-@* <section class="m-section m-section--gray m-section-banner m-section--gray">
-    <div class="m-section-banner__content">
-        <div class="m-container m-container--responsive m-container--xxl m-page__container">
-            <h1 class="toast-title portal-title">ABOGADOS DESTACADOS</h1>
-            <h5 class="text-center m--padding-bottom-20">Los mejores de nuestra firma digital</h5>
-            <div class="m-section-banner__content-link-group">
-                <div class="owl-carousel owl-theme carousel-top-lawyers-owl" id="owl2">
-                    @foreach (var item in Model.TopLawyers)
-                    {
-                        <div class="item">
-                            <div class="col-lg-8 col-md-8" style="margin:auto">
-                                @await Html.PartialAsync("Partials/_LawyerCard", item)
-                            </div>
-                        </div>
-                    }
-                </div>
+@* version1 *@
+<section id="about" class="py-5" style="background-color:#fff">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Subtítulo pequeño -->
+                <h4 class="text-uppercase font-weight-bold mb-2" style="color:#B4A76C; letter-spacing:2px;">
+                    NOSOTROS
+                </h4>
+
+                <!-- Título grande -->
+                <h1 class="display-5 font-weight-bold mb-3" style="color:#2C3E4F; text-align:left;">
+                    Impulsamos el progreso de la minería con soluciones de alto rendimiento
+                </h1>
+
+                <!-- Párrafo -->
+                <p class="lead text-muted mb-4" style="text-align:left;">
+                    Con más de una década de experiencia, nos especializamos en la importación y suministro de equipos
+                    de alta tecnología para minería de tajo abierto y subterránea.
+                </p>
+            </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Misión -->
+                <p class="mb-3 text-muted d-flex align-items-start">
+                    <i class="fas fa-bullseye fa-lg mr-2" style="color:#B4A76C;"></i>
+                    <strong>Misión:</strong>&nbsp; Proveer equipos, repuestos y soluciones especializadas para minería y manufacturera, acompañados de soporte técnico de calidad.
+                </p>
+
+                <!-- Visión -->
+                <p class="mb-4 text-muted d-flex align-items-start">
+                    <i class="fas fa-binoculars fa-lg mr-2" style="color:#B4A76C;"></i>
+                    <strong>Visión:</strong>&nbsp; Ser aliado líder de la industria minera y manufacturera en el Perú, reconocidos por proveer equipos, soluciones y soporte de excelencia.
+                </p>
+
+                <!-- Valores -->
+                <h3 class="h5 font-weight-bold mb-3" style="color:#2C3E4F;">Nuestros valores diferenciales</h3>
+                <p class="mb-2 text-muted d-flex align-items-start">
+                    <i class="fas fa-check-circle fa-lg mr-3" style="color:#007D5E;"></i>
+                    <strong>Integridad:</strong>&nbsp; Actuamos con transparencia y responsabilidad.
+                </p>
+                <p class="mb-2 text-muted d-flex align-items-start">
+                    <i class="fas fa-check-circle fa-lg mr-3" style="color:#007D5E;"></i>
+                    <strong>Eficiencia:</strong>&nbsp; Resultados reales alineados con los objetivos operativos de nuestros clientes.
+                </p>
+                <p class="mb-0 text-muted d-flex align-items-start">
+                    <i class="fas fa-check-circle fa-lg mr-3" style="color:#007D5E;"></i>
+                    <strong>Innovación:</strong>&nbsp; Soluciones modernas con una visión práctica y sostenible, anticipándonos a los desafíos del sector.
+                </p>
             </div>
         </div>
     </div>
-</section> *@
+</section>
+
+<!------------------------------------------------------------ FIN: NOSOTROS ------------------------------------------------------------>
+
+
+<!------------------------------------------------------------ INICIO: TESTIMONIOS ------------------------------------------------------------>
+
+<div id="testimonies" style="background-color:#e8e3d926;">
+    <div class="loading">Cargando testimonios...</div>
+</div>
 <!------------------------------------------------------------ FIN: TESTIMONIOS ------------------------------------------------------------>
 <!------------------------------------------------------------ INICIO: COLABORADORES ------------------------------------------------------------>
-@* <div class="" id="lawyer-banner">
-</div> *@
+<div class="" id="collaborators">
+    <div class="loading">Cargando colaboradores...</div>
+</div>
 <!------------------------------------------------------------ FIN: COLABORADORES ------------------------------------------------------------>
 @section Scripts {
     <script src="~/assets/js/ow_carousel/owl.carousel.js" asp-append-version="true"></script>

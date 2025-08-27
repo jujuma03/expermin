@@ -31,5 +31,19 @@ namespace EXPERMIN.WEB.Controllers
             var view = await this.RenderViewToStringAsync(@"/Views/Portal/Partials/_Products.cshtml", products);
             return Ok(view);
         }
+        [HttpGet("get-testimonies")]
+        public async Task<IActionResult> GetTestimonies()
+        {
+            var testimonies = await _portalService.GetAllTestimonysActiveAsync();
+            var view = await this.RenderViewToStringAsync(@"/Views/Portal/Partials/_Testimonies.cshtml", testimonies);
+            return Ok(view);
+        }
+        [HttpGet("get-collaborators")]
+        public async Task<IActionResult> GetCollaborators()
+        {
+            var collaborators = await _portalService.GetAllCollaboratorsActiveAsync();
+            var view = await this.RenderViewToStringAsync(@"/Views/Portal/Partials/_Collaborators.cshtml", collaborators);
+            return Ok(view);
+        }
     }
 }

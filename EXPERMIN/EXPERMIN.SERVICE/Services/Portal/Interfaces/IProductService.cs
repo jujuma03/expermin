@@ -15,7 +15,7 @@ namespace EXPERMIN.SERVICE.Services.Portal.Interfaces
         Task<OperationDto<ProductDto>> GetProduct(string userLoggedId, Guid id);
         Task<OperationDto<ProductDto>> GetProductActive(Guid id);
         Task<OperationDto<ResponseDto>> InsertProduct(string userLoggedId, ProductRegisterDto model);
-        Task<OperationDto<ResponseDto>> UpdateProduct(string userLoggedId, Guid bannerId, ProductUpdateDto model);
-        Task<OperationDto<ResponseDto>> DeleteProduct(string userLoggedId, Guid bannerId);
+        Task<OperationDto<ResponseDto>> UpdateProduct(string userLoggedId, Guid productId, ProductUpdateDto model);
+        Task<OperationDto<ResponseDto>> DeleteProduct(string userLoggedId, Guid productId);
     }
 }

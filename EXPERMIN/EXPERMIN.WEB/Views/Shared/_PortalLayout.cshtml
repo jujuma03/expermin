@@ -34,6 +34,7 @@
 
     <!-- Custom overrides -->
     <link href="~/css/site.css" asp-append-version="true" rel="stylesheet" />
+    <link href="~/css/site_client.css" asp-append-version="true" rel="stylesheet" type="text/css" />
 
     @RenderSection("Styles", required: false)
 </head>
@@ -63,7 +64,7 @@
                                     <span class="navbar-toggler-icon"></span>
                                 </button>
                                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                                    <ul class="navbar-nav mr-auto">
+                                    <ul class="navbar-nav w-100 justify-content-between text-center">
                                         <li class="nav-item">
                                             <a class="nav-link" href="#">INICIO</a>
                                         </li>

@@ -31,11 +31,11 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Banner
         [JsonPropertyName("routeType")]
         public int RouteType { get; set; }
 
-        [JsonPropertyName("sequenceOrderId")]
-        public byte? SequenceOrderId { get; set; }
+        [JsonPropertyName("orderId")]
+        public byte? OrderId { get; set; }
 
-        [JsonPropertyName("sequenceOrder")]
-        public string SequenceOrder { get; set; }
+        [JsonPropertyName("order")]
+        public string Order { get; set; }
 
         [JsonPropertyName("urlDirection")]
         public string UrlDirection { get; set; }

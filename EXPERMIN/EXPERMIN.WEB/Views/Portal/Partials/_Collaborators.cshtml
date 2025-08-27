@@ -1,0 +1,16 @@
+﻿@model List<EXPERMIN.WEB.Models.Portal.Collaborator.CollaboratorViewModel>
+
+@if (Model != null && Model.Count() > 0)
+{
+    <!-- Franja de logos -->
+    <section class="logo-strip">
+        <div class="container">
+            <div class="logos">
+                @foreach (var item in Model.OrderBy(i => i.Order))
+                {
+                    <img alt="@item.Name" src="@item.Image.FullUrl" />
+                }
+            </div>
+        </div>
+    </section>
+}

@@ -49,11 +49,11 @@ html {
 }
 
 .lc-background-dark-blue {
-    background-color: #152c3d
+    background-color: #2C3E4F
 }
 
 .lc-background-green {
-    background-color: #0f7f97
+    background-color: #007D5E
 }
 
 body {
@@ -115,12 +115,12 @@ body {
 }
 
 .btn-primary {
-    background: #0f7f97 !important;
-    border-color: #0f7f97 !important;
+    background: #B4A76C !important;
+    border-color: #B4A76C !important;
 }
 
 .m--font-primary {
-    color: #0f7f97 !important;
+    color: #E8E3D9 !important;
 }
 
 .m-portlet__head-text {
@@ -133,7 +133,7 @@ body {
 }*/
 
 .m-link {
-    color: #0f7f97;
+    color: #B4A76C;
 }
 
     .m-link:hover {
@@ -141,7 +141,7 @@ body {
     }
 
 .alert-primary {
-    background-color: #0f7f97 !important;
+    background-color: #B4A76C !important;
 }
 
 .m-link--secondary {
@@ -197,11 +197,11 @@ body {
     }
 
 .lc-layout-header.m-header {
-    background-color: #0f7f97;
+    background-color: #B4A76C;
 }
 
 .lc-layout-header .m-brand {
-    background-color: #0f7f97;
+    background-color: #B4A76C;
 }
 
 .lc-layout-header .m-menu__link-text.text-white {
@@ -214,7 +214,7 @@ body {
 
 .lc-layout-header .m-nav__link-icon:hover,
 .lc-layout-header .m-nav__link-icon:hover .m-nav__link-icon-wrapper {
-    background-color: #0f7f97 !important;
+    background-color: #B4A76C !important;
     opacity: 0.7
 }
 
@@ -293,13 +293,13 @@ body {
 
 @media (max-width: 1024px) {
     .m-header__bottom .navbar {
-        background-color: #0f7f97 !important
+        background-color: #B4A76C !important
     }
 }
 
 @media (max-width: 1024px) {
     .m-header__bottom .navbar {
-        background-color: #0f7f97 !important
+        background-color: #B4A76C !important
     }
 }
 
@@ -330,3 +330,50 @@ body {
         text-decoration: underline;
     }
 
+
+/* Distribución homogénea de los enlaces del header */
+.navbar-nav {
+    width: 100%;
+    justify-content: space-between;
+}
+
+    .navbar-nav .nav-item {
+        flex: 1; /* cada item ocupa el mismo ancho */
+        text-align: center; /* texto centrado en cada espacio */
+    }
+
+    .navbar-nav .nav-link {
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 0.5rem 0;
+        display: block;
+        transition: color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        /* Hover con efecto sutil */
+        .navbar-nav .nav-link:hover {
+            color: #E8E3D9;
+            box-shadow: 0 3px 0 0 #E8E3D9;
+        }
+
+/* Solo aplicar la distribución homogénea en pantallas grandes */
+@media (min-width: 992px) {
+    .navbar-nav {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+        .navbar-nav .nav-item {
+            flex: 1;
+            text-align: center;
+        }
+}
+
+/* En móviles mantener diseño simple */
+@media (max-width: 991.98px) {
+    .navbar-nav .nav-item {
+        flex: unset;
+        text-align: left;
+    }
+}

@@ -16,14 +16,23 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Product
         [JsonPropertyName("title")]
         public string Title { get; set; }
 
+        [JsonPropertyName("shortDescription")]
+        public string ShortDescription { get; set; }
+
         [JsonPropertyName("description")]
         public string Description { get; set; }
+
+        [JsonPropertyName("statusId")]
+        public int StatusId { get; set; }
 
         [JsonPropertyName("status")]
         public string Status { get; set; }
 
+        [JsonPropertyName("orderId")]
+        public byte? OrderId { get; set; }
+
         [JsonPropertyName("order")]
-        public int Order { get; set; }
+        public string Order { get; set; }
 
         [JsonPropertyName("publicationDate")]
         public string PublicationDate { get; set; }

@@ -19,8 +19,8 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Banner
         public int? Status { get; set; }
         [JsonPropertyName("routeType")]
         public int? RouteType { get; set; }
-        [JsonPropertyName("sequenceOrder")]
-        public int? SequenceOrder { get; set; }
+        [JsonPropertyName("order")]
+        public int? Order { get; set; }
         [JsonPropertyName("urlDirection")]
         public string UrlDirection { get; set; }
         [JsonPropertyName("statusDirection")]

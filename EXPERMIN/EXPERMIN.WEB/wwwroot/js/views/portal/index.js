@@ -13,51 +13,23 @@
         }
     };
 
-    var carosel = {
-        init: function () {
-            "use strict";
-            $('.next').click(function () { $('.carousel').carousel('next'); return false; });
-            $('.prev').click(function () { $('.carousel').carousel('prev'); return false; });
-        }
-    }
-
     var carousels = {
         init: function () {
             $('#owl1').owlCarousel({
                 autoplay: true,
                 loop: true,
-                margin: 50,
+                margin: 24,
                 nav: true,
                 dots: false,
+                autoplayTimeout: 5000,
+                autoplayHoverPause: true,
+                smartSpeed: 600,
+                stagePadding: 16,
                 responsive: {
-                    0: {
-                        items: 1
-                    },
-                    600: {
-                        items: 3
-                    },
-                    1000: {
-                        items: 4
-                    }
-                }
-            });
-
-            $('.carousel-top-lawyers-owl').owlCarousel({
-                autoplay: true,
-                loop: true,
-                margin: 200,
-                nav: true,
-                dots: true,
-                responsive: {
-                    0: {
-                        items: 1
-                    },
-                    600: {
-                        items: 1
-                    },
-                    1000: {
-                        items: 1
-                    }
+                    0: { items: 1 },
+                    576: { items: 1 },
+                    768: { items: 2 },
+                    992: { items: 3 } // desktop: 3 por vista
                 }
             });
         }
@@ -70,28 +42,85 @@
                 type: "Get"
             }).done(function (result) {
                 $("#products").html(result);
+
+                $(".carousel-products-owl").owlCarousel({
+                    items: 3,
+                    autoplay: true,
+                    loop: true,
+                    margin: 0,
+                    nav: true,
+                    dots: false,
+                    autoplayTimeout: 5000,
+                    autoplayHoverPause: true,
+                    smartSpeed: 600,
+                    stagePadding: 0,
+                    responsive: {
+                        0: { items: 1 },
+                        576: { items: 1 },
+                        768: { items: 2 },
+                        992: { items: 3 } // desktop: 3 por vista
+                    }
+                });
             })
             .fail(function () {
                 $("#products").html("<p>Error al cargar productos.</p>");
             });
         }
     };
-    var lawyerbanner = {
+    var testimonies = {
         init: function () {
             $.ajax({
-                url: `/get-banner-abogado`,
+                url: `/get-testimonies`,
                 type: "Get"
             }).done(function (result) {
-                $("#lawyer-banner").html(result);
-            });
+                $("#testimonies").html(result);
+
+                $(".carousel-testimonies-owl").owlCarousel({
+                    items: 3,
+                    autoplay: true,
+                    loop: true,
+                    margin: 0,
+                    nav: true,
+                    dots: false,
+                    autoplayTimeout: 5000,
+                    autoplayHoverPause: true,
+                    smartSpeed: 600,
+                    stagePadding: 0,
+                    responsive: {
+                        0: { items: 1 },
+                        576: { items: 1 },
+                        768: { items: 2 },
+                        992: { items: 3 } // desktop: 3 por vista
+                    }
+                });
+            })
+                .fail(function () {
+                    $("#testimonies").html("<p>Error al cargar testimonios.</p>");
+                });
         }
     };
+
+    var collaborators = {
+        init: function () {
+            $.ajax({
+                url: `/get-collaborators`,
+                type: "Get"
+            }).done(function (result) {
+                $("#collaborators").html(result);
+            })
+                .fail(function () {
+                    $("#collaborators").html("<p>Error al cargar categorias.</p>");
+                });
+        }
+    };
+
     return {
         init: function () {
             events.init();
             products.init();
-            //lawyerbanner.init();
+            testimonies.init();
             carousels.init();
+            collaborators.init();
 
         }
     };

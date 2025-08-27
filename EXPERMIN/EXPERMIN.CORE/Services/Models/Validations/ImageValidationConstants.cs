@@ -42,6 +42,6 @@ namespace EXPERMIN.CORE.Services.Models.Validations
 
         // Tamaños máximos (en bytes)
         public const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
-        public const long MinFileSize = 10 * 1024;       // 10 KB (evita archivos vacíos o muy pequeños)
+        public const long MinFileSize = 5 * 1024;       // 10 KB (evita archivos vacíos o muy pequeños)
     }
 }

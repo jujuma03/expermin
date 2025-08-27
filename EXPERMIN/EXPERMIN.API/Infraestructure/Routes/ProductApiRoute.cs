@@ -2,11 +2,11 @@
 {
     public class ProductApiRoute
     {
-        public const string BaseRoute = "api/v1/produtc";
+        public const string BaseRoute = "api/v1/product";
         public static class Task
         {
             public const string GetAllProducts = "get-all";
-            public const string GetProductById = "get/{produtcId:guid}";
+            public const string GetProductById = "get/{productId:guid}";
         }
     }
 }

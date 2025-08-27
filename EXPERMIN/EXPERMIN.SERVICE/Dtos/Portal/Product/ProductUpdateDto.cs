@@ -11,12 +11,14 @@ namespace EXPERMIN.SERVICE.Dtos.Portal.Product
     {
         [JsonPropertyName("title")]
         public string Title { get; set; }
+        [JsonPropertyName("shortDescription")]
+        public string ShortDescription { get; set; }
         [JsonPropertyName("description")]
         public string Description { get; set; }
         [JsonPropertyName("status")]
-        public int Status { get; set; }
+        public int? Status { get; set; }
         [JsonPropertyName("order")]
-        public int Order { get; set; }
+        public int? Order { get; set; }
         [JsonPropertyName("imageId")]
         public Guid? ImageId { get; set; }
     }

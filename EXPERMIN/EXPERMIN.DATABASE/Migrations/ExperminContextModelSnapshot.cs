@@ -165,13 +165,13 @@ namespace EXPERMIN.DATABASE.Migrations
                     b.Property<string>("NameDirection")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte?>("Order")
+                        .HasColumnType("tinyint");
+
                     b.Property<DateTime>("PublicationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<byte>("RouteType")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte?>("SequenceOrder")
                         .HasColumnType("tinyint");
 
                     b.Property<byte>("Status")
@@ -192,6 +192,41 @@ namespace EXPERMIN.DATABASE.Migrations
                         .IsUnique();
 
                     b.ToTable("Banners");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Collaborator", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MediaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte?>("Order")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("PublicationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaFileId")
+                        .IsUnique();
+
+                    b.ToTable("Collaborators");
                 });
 
             modelBuilder.Entity("EXPERMIN.ENTITIES.Models.MediaFile", b =>
@@ -253,6 +288,9 @@ namespace EXPERMIN.DATABASE.Migrations
                     b.Property<DateTime>("PublicationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
@@ -287,6 +325,47 @@ namespace EXPERMIN.DATABASE.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RevokedTokens");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Testimony", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClientName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MediaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte?>("Order")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("PublicationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("Rating")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaFileId")
+                        .IsUnique();
+
+                    b.ToTable("Testimonies");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -410,11 +489,33 @@ namespace EXPERMIN.DATABASE.Migrations
                     b.Navigation("MediaFile");
                 });
 
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Collaborator", b =>
+                {
+                    b.HasOne("EXPERMIN.ENTITIES.Models.MediaFile", "MediaFile")
+                        .WithOne()
+                        .HasForeignKey("EXPERMIN.ENTITIES.Models.Collaborator", "MediaFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MediaFile");
+                });
+
             modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Product", b =>
                 {
                     b.HasOne("EXPERMIN.ENTITIES.Models.MediaFile", "MediaFile")
                         .WithOne()
                         .HasForeignKey("EXPERMIN.ENTITIES.Models.Product", "MediaFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MediaFile");
+                });
+
+            modelBuilder.Entity("EXPERMIN.ENTITIES.Models.Testimony", b =>
+                {
+                    b.HasOne("EXPERMIN.ENTITIES.Models.MediaFile", "MediaFile")
+                        .WithOne()
+                        .HasForeignKey("EXPERMIN.ENTITIES.Models.Testimony", "MediaFileId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -155,21 +155,34 @@ namespace EXPERMIN.API
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
-            builder.Services.AddHttpContextAccessor();
+			builder.Services.AddScoped<ITestimonyRepository, TestimonyRepository>();
+			builder.Services.AddScoped<ITestimonyService, TestimonyService>();
+
+			builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
+			builder.Services.AddScoped<ICollaboratorService, CollaboratorService>();
+
+			builder.Services.AddHttpContextAccessor();
 
             #endregion
 
             // Add services to the container.
-            builder.Services.AddControllers(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            }).AddJsonOptions(op =>
+           //builder.Services.AddControllers(options =>
+           //{
+           //    var policy = new AuthorizationPolicyBuilder()
+           //        .RequireAuthenticatedUser()
+           //        .Build();
+           //    options.Filters.Add(new AuthorizeFilter(policy));
+           //}).AddJsonOptions(op =>
+           //{
+           //    op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+           //});
+
+            builder.Services.AddControllers()
+            .AddJsonOptions(op =>
             {
                 op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -188,7 +201,7 @@ namespace EXPERMIN.API
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseRouting();
 
             // Servir archivos estáticos desde el storage local
@@ -201,11 +214,23 @@ namespace EXPERMIN.API
 
                 app.UseStaticFiles(new StaticFileOptions
                 {
-                    FileProvider = new PhysicalFileProvider(localStoragePath),
+                    FileProvider = new PhysicalFileProvider(absolutePath),
                     RequestPath = "/uploads" // URL pública -> https://localhost:7020/uploads/...
                 });
             }
 
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.StartsWithSegments("/uploads"))
+                {
+                    // Saltar autenticación para estáticos
+                    await next();
+                }
+                else
+                {
+                    await next();
+                }
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();

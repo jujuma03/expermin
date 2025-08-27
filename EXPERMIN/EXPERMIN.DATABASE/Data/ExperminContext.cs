@@ -60,6 +60,20 @@ namespace EXPERMIN.DATABASE.Data
                 .WithOne()
                 .HasForeignKey<Product>(b => b.MediaFileId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Testimonio 1:1 MediaFile
+            modelBuilder.Entity<Testimony>()
+                .HasOne(b => b.MediaFile)
+                .WithOne()
+                .HasForeignKey<Testimony>(b => b.MediaFileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Colaborador 1:1 MediaFile
+            modelBuilder.Entity<Collaborator>()
+                .HasOne(b => b.MediaFile)
+                .WithOne()
+                .HasForeignKey<Collaborator>(b => b.MediaFileId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -86,6 +100,8 @@ namespace EXPERMIN.DATABASE.Data
 
         public DbSet<Banner> Banners { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Testimony> Testimonies { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
+        public DbSet<Collaborator> Collaborators { get; set; }
     }
 }

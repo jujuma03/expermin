@@ -1,3 +1,4 @@
+using EXPERMIN.SERVICE.Storage.Model;
 using EXPERMIN.WEB.Services.Portal.Portal.Implementations;
 using EXPERMIN.WEB.Services.Portal.Portal.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +22,9 @@ namespace EXPERMIN.WEB
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+            builder.Services.Configure<StorageOptions>(
+                builder.Configuration.GetSection("Storage:Local"));
+
 
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
@@ -57,7 +61,7 @@ namespace EXPERMIN.WEB
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

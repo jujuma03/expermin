@@ -15,7 +15,7 @@ namespace EXPERMIN.ENTITIES.Models
         public byte RouteType { get; set; }
         public Guid MediaFileId { get; set; }
         public MediaFile MediaFile { get; set; }
-        public byte? SequenceOrder { get; set; }
+        public byte? Order { get; set; } = 255;
         public string UrlDirection { get; set; }
         public byte StatusDirection { get; set; }
         public string NameDirection { get; set; }

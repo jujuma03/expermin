@@ -46,7 +46,8 @@ namespace EXPERMIN.SERIVICE.Services.Implementations
             }
 
             // Construir URL pública desde configuración
-            var fileUrl = $"{_settings.BaseUrl}/{subFolder}/{uniqueFileName}";
+            var fileUrl = $"/uploads/{subFolder}/{uniqueFileName}";
+            //var fileUrl = $"{_settings.BaseUrl}/{subFolder}/{uniqueFileName}";
 
             return (filePath, fileUrl);
         }
@@ -75,7 +76,9 @@ namespace EXPERMIN.SERIVICE.Services.Implementations
             File.Move(currentPath, newPath, overwrite: true);
 
             // Nueva URL pública
-            var newUrl = $"{_settings.BaseUrl}/{targetFolder}/{fileName}";
+
+            var newUrl = $"/uploads/{targetFolder}/{fileName}";
+            //var newUrl = $"{_settings.BaseUrl}/{targetFolder}/{fileName}";
 
             return (newPath, newUrl);
         }

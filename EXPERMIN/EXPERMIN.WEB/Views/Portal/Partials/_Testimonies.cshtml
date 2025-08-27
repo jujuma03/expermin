@@ -1,0 +1,143 @@
+﻿@* @model List<EXPERMIN.WEB.Models.Portal.Testimony.TestimonyViewModel>
+
+@if (Model != null && Model.Count() > 0)
+{
+
+    <section class="m-section m-section--gray m-section-banner m-section--gray">
+        <div class="m-section-banner__content">
+            <div class="m-container m-container--responsive m-container--xxl m-page__container">
+                <h1 class="toast-title portal-title">TESTIMONIOS</h1>
+                <h5 class="text-center m--padding-bottom-20">Los mejores de nuestra firma digital</h5>
+                <div class="m-section-banner__content-link-group">
+                    <div class="owl-carousel owl-theme carousel-top-lawyers-owl" id="owl2">
+                        @foreach (var item in Model.OrderBy(i => i.Order))
+                        {
+                            <div class="item">
+                                <div class="col-lg-8 col-md-8" style="margin:auto">
+                                    <div class="m-portlet m-portlet--bordered m-portlet--bordered-semi m-portlet--rounded m-portlet--hover complete-card">
+                                        <div class="m-portlet__body">
+                                            <div class="row">
+                                                <div class="col-lg-8 ">
+                                                    <div class="m-portlet__head" style="height: 150px;padding:0">
+                                                        <div class="m-portlet__head-caption">
+                                                            <div class="m-portlet__head-title">
+                                                                <span class="m-portlet__head-icon">
+                                                                    @if (!string.IsNullOrEmpty(item.Image.Url))
+                                                                    {
+                                                                        <img class="" style="border-radius:50px;height:100px;max-width: 100px;" src="@item.Image.Url" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img class="" style="border-radius:50px;height:100px;max-width: 100px;" src="~/images/general/profile.jpg" />
+                                                                    }
+                                                                </span>
+                                                                <div class="m-portlet__head-label" data-id="@item.Id">
+                                                                    <h3 class="m--font-boldest3" style="color:#152c3d; font-size:25px;">
+                                                                        @item.ClientName.ToUpper()
+                                                                    </h3>
+                                                                    <h6 style="text-align:left;width:100%;">
+                                                                        @if (item.Rating > 0)
+                                                                        {
+                                                                            <span class="m--font-boldest3" style="color:#152c3d; font-size:20px;">
+                                                                                @item.Rating.ToString("0.0")
+                                                                            </span>
+
+                                                                            @for (int i = 1; i <= Convert.ToInt32(item.Rating); i++)
+                                                                            {
+                                                                                <span class="fa fa-star checked"></span>
+                                                                            }
+                                                                            @for (int i = 1; i <= (5 - Convert.ToInt32(item.Rating)); i++)
+                                                                            {
+                                                                                <span class="fa fa-star"></span>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span>Sin calificar</span>
+                                                                        }
+                                                                    </h6>
+                                                                    <p>@item.Comment</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+} *@
+
+@model List<EXPERMIN.WEB.Models.Portal.Testimony.TestimonyViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <section class="m-section m-section--gray m-section-banner">
+        <div class="m-section-banner__content">
+            <div class="m-container m-container--responsive m-container--xxl m-page__container portal-testimonials">
+
+                <!-- Header de sección -->
+                <div class="portal-header mb-5 mt-5 ml-5">
+                    <h5 class="portal-section">TESTIMONIOS</h5>
+                    <h1 class="portal-subtitle">Lo que dicen nuestros clientes</h1>
+                </div>
+
+                <div class="m-section-banner__content-link-group">
+                    <div class="owl-carousel owl-theme carousel-testimonies-owl">
+                        @foreach (var item in Model.OrderBy(i => i.Order))
+                        {
+                            <div class="item">
+                                <div class="testimonial-card m-portlet m-portlet--bordered m-portlet--rounded m-portlet--hover">
+                                    <div class="testimonial-avatar">
+                                        @if (!string.IsNullOrEmpty(item.Image?.Url))
+                                        {
+                                            <img src="@item.Image.FullUrl" alt="@($"{item.ClientName} - foto")" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/general/profile.jpg" alt="Foto de perfil" />
+                                        }
+                                    </div>
+
+                                    <h3 class="testimonial-name">@item.ClientName?.ToUpper()</h3>
+
+                                    <div class="testimonial-rating">
+                                        @if (item.Rating > 0)
+                                        {
+                                            @for (int i = 1; i <= Convert.ToInt32(item.Rating); i++)
+                                            {
+                                                <span class="fa fa-star checked"></span>
+                                            }
+                                            @for (int i = 1; i <= (5 - Convert.ToInt32(item.Rating)); i++)
+                                            {
+                                                <span class="fa fa-star"></span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span>Sin calificar</span>
+                                        }
+                                    </div>
+
+                                    <blockquote class="testimonial-quote">
+                                        <i class="fa fa-quote-left" aria-hidden="true"></i>
+                                        <span>@item.Comment</span>
+                                        <i class="fa fa-quote-right" aria-hidden="true"></i>
+                                    </blockquote>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+}

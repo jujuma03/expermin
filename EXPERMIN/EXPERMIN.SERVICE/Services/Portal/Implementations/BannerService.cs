@@ -67,10 +67,10 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                     PublicationDate = x.PublicationDate.ToLocalDateTimeFormat(),
                     StatusId = x.Status,
                     Status = ConstantHelpers.BANNER.STATUS.VALUES[x.Status],
-                    SequenceOrder = (x.SequenceOrder.HasValue && x.SequenceOrder.Value != 0)
-                            ? ConstantHelpers.BANNER.ORDER.VALUES[x.SequenceOrder.Value]
-                            : ConstantHelpers.BANNER.ORDER.VALUES[ConstantHelpers.BANNER.ORDER.NO_ORDER],
-                    SequenceOrderId = x.SequenceOrder ?? 0,
+                    Order = (x.Order.HasValue && x.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[x.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                    OrderId = x.Order ?? 0,
                     Image = x.MediaFile == null ? null : new MediaFileDto
                     {
                         Id = x.MediaFile.Id,
@@ -99,11 +99,11 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
             // Obtengo todos los SequenceOrder existentes en BD (solo los que no son null)
             var usedOrders = await _bannerRepository
                 .GetAsQueryable()
-                .Where(b => b.SequenceOrder.HasValue)
-                .Select(b => (int)b.SequenceOrder.Value)
+                .Where(b => b.Order.HasValue)
+                .Select(b => (int)b.Order.Value)
                 .ToListAsync();
 
-            var availableOrders = ConstantHelpers.BANNER.ORDER.VALUES
+            var availableOrders = ConstantHelpers.ORDER.VALUES
                 .Where(x => !usedOrders.Contains(x.Key));
 
             if (!availableOrders.Any())
@@ -124,10 +124,10 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                     PublicationDate = x.PublicationDate.ToLocalDateTimeFormat(),
                     StatusId = x.Status,
                     Status = ConstantHelpers.BANNER.STATUS.VALUES[x.Status],
-                    SequenceOrder = (x.SequenceOrder.HasValue && x.SequenceOrder.Value != 0)
-                            ? ConstantHelpers.BANNER.ORDER.VALUES[x.SequenceOrder.Value]
-                            : ConstantHelpers.BANNER.ORDER.VALUES[ConstantHelpers.BANNER.ORDER.NO_ORDER],
-                    SequenceOrderId = x.SequenceOrder ?? 0,
+                    Order = (x.Order.HasValue && x.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[x.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                    OrderId = x.Order ?? 0,
                     Description = x.Description,
                     NameDirection = x.NameDirection,
                     RouteType = x.RouteType,
@@ -169,10 +169,10 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                     PublicationDate = x.PublicationDate.ToLocalDateTimeFormat(),
                     StatusId = x.Status,
                     Status = ConstantHelpers.BANNER.STATUS.VALUES[x.Status],
-                    SequenceOrder = (x.SequenceOrder.HasValue && x.SequenceOrder.Value != 0)
-                            ? ConstantHelpers.BANNER.ORDER.VALUES[x.SequenceOrder.Value]
-                            : ConstantHelpers.BANNER.ORDER.VALUES[ConstantHelpers.BANNER.ORDER.NO_ORDER],
-                    SequenceOrderId = x.SequenceOrder ?? 0,
+                    Order = (x.Order.HasValue && x.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[x.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                    OrderId = x.Order ?? 0,
                     UrlDirection = x.UrlDirection,
                     StatusDirection = x.StatusDirection,
                     RouteType = x.RouteType,
@@ -193,7 +193,7 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 .ToListAsync();
 
             if (!banners.Any())
-                return new OperationDto<List<BannerDto>>(OperationCodeDto.EmptyResult, "No hay banners activos.");
+                return new OperationDto<List<BannerDto>>(OperationCodeDto.EmptyResult, "No hay banners registrados.");
 
             return new OperationDto<List<BannerDto>>(banners);
         }
@@ -220,10 +220,10 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 PublicationDate = banner.PublicationDate.ToLocalDateTimeFormat(),
                 StatusId = banner.Status,
                 Status = ConstantHelpers.BANNER.STATUS.VALUES[banner.Status],
-                SequenceOrder = (banner.SequenceOrder.HasValue && banner.SequenceOrder.Value != 0)
-                            ? ConstantHelpers.BANNER.ORDER.VALUES[banner.SequenceOrder.Value]
-                            : ConstantHelpers.BANNER.ORDER.VALUES[ConstantHelpers.BANNER.ORDER.NO_ORDER],
-                SequenceOrderId = banner.SequenceOrder ?? 0,
+                Order = (banner.Order.HasValue && banner.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[banner.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                OrderId = banner.Order ?? 0,
                 Description = banner.Description,
                 NameDirection = banner.NameDirection,
                 RouteType = banner.RouteType,
@@ -261,10 +261,10 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 PublicationDate = banner.PublicationDate.ToLocalDateTimeFormat(),
                 StatusId = banner.Status,
                 Status = ConstantHelpers.BANNER.STATUS.VALUES[banner.Status],
-                SequenceOrder = (banner.SequenceOrder.HasValue && banner.SequenceOrder.Value != 0)
-                            ? ConstantHelpers.BANNER.ORDER.VALUES[banner.SequenceOrder.Value]
-                            : ConstantHelpers.BANNER.ORDER.VALUES[ConstantHelpers.BANNER.ORDER.NO_ORDER],
-                SequenceOrderId = banner.SequenceOrder ?? 0,
+                Order = (banner.Order.HasValue && banner.Order.Value != 0)
+                            ? ConstantHelpers.ORDER.VALUES[banner.Order.Value]
+                            : ConstantHelpers.ORDER.VALUES[ConstantHelpers.ORDER.NO_ORDER],
+                OrderId = banner.Order ?? 0,
                 UrlDirection = banner.UrlDirection,
                 StatusDirection = banner.StatusDirection,
                 RouteType = banner.RouteType,
@@ -307,23 +307,26 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
 
             // Validar que pueda insertar el banner en la orden indicada, sino se pondrá como oculto y sin orden
             var bannerActive = await GetAllBannersActive();
-            if (bannerActive.Result.Count() >= 5)
+            if (bannerActive?.Result?.Any() == true)
             {
-                model.Status = ConstantHelpers.BANNER.STATUS.HIDDEN;
-                model.SequenceOrder = ConstantHelpers.BANNER.ORDER.NO_ORDER;
-            }
-            else
-            {
-                // Validar que no se repita el orden
-                if(bannerActive.Result.Any(b => b.SequenceOrderId == model.SequenceOrder))
-                    return new OperationDto<ResponseDto>(OperationCodeDto.OperationError, "Ya hay otro banner en esa posición/orden de visualización.");
+                if (bannerActive.Result.Count() >= 5)
+                {
+                    model.Status = ConstantHelpers.BANNER.STATUS.HIDDEN;
+                    model.Order = ConstantHelpers.ORDER.NO_ORDER;
+                }
+                else
+                {
+                    // Validar que no se repita el orden
+                    if (bannerActive.Result.Any(b => b.OrderId == model.Order))
+                        return new OperationDto<ResponseDto>(OperationCodeDto.OperationError, "Ya hay otro banner en esa posición/orden de visualización.");
+                }
             }
 
             // si lo inserta como oculto, no debería tener orden
             if (model.Status == ConstantHelpers.BANNER.STATUS.HIDDEN || model.Status == 0)
-                model.SequenceOrder = ConstantHelpers.BANNER.ORDER.NO_ORDER;
+                model.Order = ConstantHelpers.ORDER.NO_ORDER;
             // si lo inserta sin orden, debería ser oculto
-            if (model.SequenceOrder == ConstantHelpers.BANNER.ORDER.NO_ORDER || model.SequenceOrder == 0)
+            if (model.Order == ConstantHelpers.ORDER.NO_ORDER || model.Order == 0)
                 model.Status = ConstantHelpers.BANNER.STATUS.HIDDEN;
 
             var banner = new Banner()
@@ -333,7 +336,7 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 Headline = model.Headline,
                 Status = (byte)model.Status,
                 RouteType = (byte)model.RouteType,
-                SequenceOrder = (byte)model.SequenceOrder,
+                Order = (byte)model.Order,
                 UrlDirection = model.UrlDirection,
                 PublicationDate = DateTime.UtcNow,
                 StatusDirection = (byte)model.StatusDirection,
@@ -379,30 +382,32 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
 
             // Validar que pueda insertar el banner en la orden indicada
             var bannerActive = await GetAllBannersActive();
-            if (bannerActive.Result.Count() >= 5)
+            if (bannerActive?.Result?.Any() == true)
             {
-                model.Status = ConstantHelpers.BANNER.STATUS.HIDDEN;
-                model.SequenceOrder = ConstantHelpers.BANNER.ORDER.NO_ORDER;
+                if (bannerActive.Result.Count() >= 5)
+                {
+                    model.Status = ConstantHelpers.BANNER.STATUS.HIDDEN;
+                    model.Order = ConstantHelpers.ORDER.NO_ORDER;
+                }
+                else
+                {
+                    if (model.Order > 0 &&
+                        bannerActive.Result.Any(b => b.OrderId == model.Order &&
+                            !string.Equals(b.Id, banner.Id.ToString(), StringComparison.OrdinalIgnoreCase)))
+                        return new OperationDto<ResponseDto>(OperationCodeDto.OperationError, "Ya hay otro banner en esa posición.");
+                }
             }
-            else
-            {
-                if (model.SequenceOrder > 0 &&
-                    bannerActive.Result.Any(b => b.SequenceOrderId == model.SequenceOrder &&
-                        !string.Equals(b.Id, banner.Id.ToString(), StringComparison.OrdinalIgnoreCase)))
-                    return new OperationDto<ResponseDto>(OperationCodeDto.OperationError, "Ya hay otro banner en esa posición.");
-            }
-
 
             // si lo actualiza como oculto, no debería tener orden
             if (model.Status == ConstantHelpers.BANNER.STATUS.HIDDEN)
-                model.SequenceOrder = ConstantHelpers.BANNER.ORDER.NO_ORDER;
+                model.Order = ConstantHelpers.ORDER.NO_ORDER;
             // si lo actualiza sin orden, debería ser oculto
-            if (model.SequenceOrder == ConstantHelpers.BANNER.ORDER.NO_ORDER)
+            if (model.Order == ConstantHelpers.ORDER.NO_ORDER)
                 model.Status = ConstantHelpers.BANNER.STATUS.HIDDEN;
 
             Guid? oldImageId = null;
 
-            // Mapear propiedades
+            // Mapear resto de propiedades (menos la imagen, que manejamos manualmente)
             _mapper.Map(model, banner);
 
             return await _bannerRepository.ExecuteInTransactionWithSaveAsync(async () =>
@@ -412,7 +417,7 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 {
                     var newImage = await _mediaFileRepository.Get(model.ImageId.Value);
                     if (newImage == null)
-                        return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "La nueva imagen no existe.");
+                        return new OperationDto<ResponseDto>(OperationCodeDto.DoesNotExist, "La nueva imagen no existe en el sistema.");
 
                     // mover archivo desde Temporales → banners
                     var fileName = Path.GetFileName(newImage.Path);
@@ -447,7 +452,6 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 return new OperationDto<ResponseDto>(new ResponseDto() { Suceso = true, Mensaje = "Banner actualizado Correctamente" });
             });
         }
-
         public async Task<OperationDto<ResponseDto>> DeleteBanner(string userLoggedId, Guid bannerId)
         {
             // Solo ADMIN permitido
@@ -470,7 +474,10 @@ namespace EXPERMIN.SERVICE.Services.Portal.Implementations
                 // Eliminar mediaFile asociado
                 var mediaFile = await _mediaFileRepository.Get(banner.MediaFileId);
                 if (mediaFile != null)
+                {
+                    await _fileStorageService.DeleteFileAsync(mediaFile.Path);
                     _mediaFileRepository.Delete(mediaFile);
+                }
 
                 return new OperationDto<ResponseDto>(
                     new ResponseDto()
