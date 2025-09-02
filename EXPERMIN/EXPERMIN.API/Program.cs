@@ -21,6 +21,7 @@ using EXPERMIN.SERVICE.Services.Portal.Implementations;
 using EXPERMIN.SERVICE.Services.Portal.Interfaces;
 using EXPERMIN.SERVICE.Services.User.Implementations;
 using EXPERMIN.SERVICE.Services.User.Interfaces;
+using EXPERMIN.SERVICE.Storage.Implementations;
 using EXPERMIN.SERVICE.Storage.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -117,8 +118,8 @@ namespace EXPERMIN.API
                 case ConstantHelpers.FILESTORAGE.LOCAL:
                     builder.Services.AddScoped<IFileStorageService, LocalStorageServices>();
                     break;
-                case ConstantHelpers.FILESTORAGE.AZURE:
-                    //builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+                case ConstantHelpers.FILESTORAGE.UPCLOUD:
+                    builder.Services.AddScoped<IFileStorageService, UpcloudStorageServices>();
                     break;
                 case ConstantHelpers.FILESTORAGE.AMAZONS3:
                     //builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();

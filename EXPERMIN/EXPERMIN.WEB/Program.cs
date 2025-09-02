@@ -23,7 +23,7 @@ namespace EXPERMIN.WEB
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             builder.Services.Configure<StorageOptions>(
-                builder.Configuration.GetSection("Storage:Local"));
+                builder.Configuration.GetSection("Storage:Upcloud"));
 
 
             builder.Logging.ClearProviders();

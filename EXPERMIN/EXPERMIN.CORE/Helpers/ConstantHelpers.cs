@@ -27,12 +27,14 @@ namespace EXPERMIN.CORE.Helpers
             public const byte LOCAL = 1;
             public const byte AZURE = 2;
             public const byte AMAZONS3 = 3;
+            public const byte UPCLOUD = 4;
 
             public static Dictionary<int, string> VALUES = new Dictionary<int, string>
                     {
                         { LOCAL, "Local" },
                         { AZURE, "Azure" },
-                        { AMAZONS3, "Amazon S3" }
+                        { AMAZONS3, "Amazon S3" },
+                        { UPCLOUD, "Upcloud" }
                     };
 
         }
