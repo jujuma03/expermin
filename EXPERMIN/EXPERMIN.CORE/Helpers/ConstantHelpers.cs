@@ -25,16 +25,16 @@ namespace EXPERMIN.CORE.Helpers
         public static class FILESTORAGE
         {
             public const byte LOCAL = 1;
-            public const byte AZURE = 2;
-            public const byte AMAZONS3 = 3;
-            public const byte UPCLOUD = 4;
+            public const byte UPCLOUD = 2;
+            public const byte AZURE = 3;
+            public const byte AMAZONS3 = 4;
 
             public static Dictionary<int, string> VALUES = new Dictionary<int, string>
                     {
                         { LOCAL, "Local" },
+                        { UPCLOUD, "Upcloud" },
                         { AZURE, "Azure" },
-                        { AMAZONS3, "Amazon S3" },
-                        { UPCLOUD, "Upcloud" }
+                        { AMAZONS3, "Amazon S3" }
                     };
 
         }

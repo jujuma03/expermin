@@ -117,20 +117,30 @@ namespace EXPERMIN.API
             {
                 case ConstantHelpers.FILESTORAGE.LOCAL:
                     builder.Services.AddScoped<IFileStorageService, LocalStorageServices>();
+                    builder.Services.Configure<StorageOptions>(
+                         builder.Configuration.GetSection("Storage:Local"));
                     break;
                 case ConstantHelpers.FILESTORAGE.UPCLOUD:
                     builder.Services.AddScoped<IFileStorageService, UpcloudStorageServices>();
+                    builder.Services.Configure<StorageOptions>(
+                         builder.Configuration.GetSection("Storage:Upcloud"));
+                    break;
+                case ConstantHelpers.FILESTORAGE.AZURE:
+                    //builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+                    builder.Services.Configure<StorageOptions>(
+                         builder.Configuration.GetSection("Storage:Azure"));
                     break;
                 case ConstantHelpers.FILESTORAGE.AMAZONS3:
                     //builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+                    builder.Services.Configure<StorageOptions>(
+                         builder.Configuration.GetSection("Storage:S3"));
                     break;
                 default: // Local
                     builder.Services.AddScoped<IFileStorageService, LocalStorageServices>();
                     break;
-            };
+            }
+            ;
 
-            builder.Services.Configure<StorageOptions>(
-                 builder.Configuration.GetSection("Storage:Local"));
 
             #endregion
             #region REPOSITORY / SERVICE
@@ -143,7 +153,7 @@ namespace EXPERMIN.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserServices>();
             builder.Services.AddScoped<IUserValidationService, UserValidationService>();
-            
+
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
             builder.Services.AddScoped<IBannerRepository, BannerRepository>();
@@ -156,27 +166,27 @@ namespace EXPERMIN.API
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
-			builder.Services.AddScoped<ITestimonyRepository, TestimonyRepository>();
-			builder.Services.AddScoped<ITestimonyService, TestimonyService>();
+            builder.Services.AddScoped<ITestimonyRepository, TestimonyRepository>();
+            builder.Services.AddScoped<ITestimonyService, TestimonyService>();
 
-			builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
-			builder.Services.AddScoped<ICollaboratorService, CollaboratorService>();
+            builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
+            builder.Services.AddScoped<ICollaboratorService, CollaboratorService>();
 
-			builder.Services.AddHttpContextAccessor();
+            builder.Services.AddHttpContextAccessor();
 
             #endregion
 
             // Add services to the container.
-           //builder.Services.AddControllers(options =>
-           //{
-           //    var policy = new AuthorizationPolicyBuilder()
-           //        .RequireAuthenticatedUser()
-           //        .Build();
-           //    options.Filters.Add(new AuthorizeFilter(policy));
-           //}).AddJsonOptions(op =>
-           //{
-           //    op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-           //});
+            //builder.Services.AddControllers(options =>
+            //{
+            //    var policy = new AuthorizationPolicyBuilder()
+            //        .RequireAuthenticatedUser()
+            //        .Build();
+            //    options.Filters.Add(new AuthorizeFilter(policy));
+            //}).AddJsonOptions(op =>
+            //{
+            //    op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            //});
 
             builder.Services.AddControllers()
             .AddJsonOptions(op =>
@@ -196,11 +206,11 @@ namespace EXPERMIN.API
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //if (app.Environment.IsDevelopment())
+            //{
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //}
 
             //app.UseHttpsRedirection();
             app.UseRouting();
